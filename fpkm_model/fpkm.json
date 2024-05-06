@@ -4,7 +4,7 @@
     "split": [
         {
             "name": "RandomSplitter",
-            "params": [{"split": [[0.6, 0.2, 0.2], [0.7, 0.15, 0.15]]}]
+            "params": [{"split": [[0.6, 0.2, 0.2]]}]
         }
     ]
 }
