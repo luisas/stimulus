@@ -14,12 +14,10 @@ data_params:
     space: [16, 32]
     mode: choice
 
-optimizer:
+optimizer_params:
   method:
     space: ['Adam', 'SGD']
     mode: choice
-
-optimizer_params:
   lr:
     space: [0.0001, 0.1]
     mode: loguniform
