@@ -76,3 +76,14 @@ class TitanicExperiment(AbstractExperiment):
         self.int_reg = {'encoder': encoders.IntRankEncoder(), 'noise_generators': {}}
         self.float_rank = {'encoder': encoders.FloatRankEncoder(), 'noise_generators': {}}
 
+
+class FPKMExperiment(AbstractExperiment):
+    """
+    Class for dealing with the Titanic dataset as a test format.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.dna = {'encoder': encoders.TextOneHotEncoder(alphabet='acgt'), 'data_transformation_generators': {'UniformTextMasker': data_transformation_generators.UniformTextMasker(mask='N'), 'ReverseComplement': data_transformation_generators.ReverseComplement()}}
+
+

@@ -19,6 +19,7 @@ class TuneWrapper():
         self.config = YamlRayConfigLoader(config_path).get_config()
         self.config["model"] = model_class
         self.config["experiment"] = experiment_object
+        self.best_config = None
 
         if not os.path.exists(data_path):
             raise ValueError("Data path does not exist. Given path:" + data_path)
@@ -48,7 +49,18 @@ class TuneWrapper():
         """
         Run the tuning process.
         """
-        return self.tuner.fit() 
+        results = self.tuner.fit()
+        self.best_config = os.path.join(results.get_best_result().path, "params.json")
+        return results 
+
+
+    def store_best_config(self, path: str) -> None:
+        """
+        Store the best config in a file.
+        """
+        with open(path, "w") as f:
+            f.write(str(self.best_config))            
+    
 
 class TuneModel(Trainable):
 
@@ -119,7 +131,7 @@ class TuneModel(Trainable):
         self.model.eval()
         with torch.no_grad():
             for x, y, meta in self.validation:
-                loss += self.model.batch(x, y, **self.loss_dict).item()
+                loss += self.model.batch(x, y, optimizer = self.optimizer, **self.loss_dict).item()
         loss /= len(self.validation)
         return loss
         

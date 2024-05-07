@@ -13,4 +13,4 @@ bin/**/__pycache__/
 .coverage
 .vscode/
 bin/.vscode/
-
+__pycache__

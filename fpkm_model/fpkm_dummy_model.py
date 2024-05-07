@@ -14,26 +14,27 @@ class ModelFPKMDummy(nn.Module):
                     )
         self.flatten = nn.Flatten()
         
-        # total length of the output of the first convolutional layer
         output_length = input_length - kernel_size_1 + 1
         self.linear = nn.Sequential(
-                            nn.Linear(output_length, 1), 
+                            nn.Linear(13780, 1), 
                             nn.Softplus()
                     )
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, sequence: torch.Tensor):
+        x = sequence.permute(0, 2, 1).to(torch.float32)  # permute the two last dimensions of hello 
         x = self.conv1(x)
         x = self.flatten(x)
+        print(x.shape)
         x = self.linear(x)
         x = self.relu(x)
         x = self.softmax(x)
         x = x.squeeze()        
         return x
     
-    def compute_loss(self, loss_fn, output, survived):
-        return loss_fn(output, survived)
+    def compute_loss(self, loss_fn, output, fpkm):
+        return loss_fn(output, fpkm)
     
     def batch(self, x: dict, y: dict, loss_fn: Callable, optimizer: Callable):
 
