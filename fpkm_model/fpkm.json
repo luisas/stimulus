@@ -1,0 +1,10 @@
+{
+    "experiment": "DnaToFloatExperiment",
+    "interpret_params_mode": "column_wise", 
+    "split": [
+        {
+            "name": "RandomSplitter",
+            "params": [{"split": [[0.6, 0.2, 0.2]]}]
+        }
+    ]
+}
