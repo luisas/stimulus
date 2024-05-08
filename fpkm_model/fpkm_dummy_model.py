@@ -14,7 +14,7 @@ class ModelFPKMDummy(nn.Module):
                     )
         self.flatten = nn.Flatten()
         
-        output_length = input_length - kernel_size_1 + 1
+        #output_length = input_length - kernel_size_1 + 1
         self.linear = nn.Sequential(
                             nn.Linear(13780, 1), 
                             nn.Softplus()
@@ -26,7 +26,6 @@ class ModelFPKMDummy(nn.Module):
         x = sequence.permute(0, 2, 1).to(torch.float32)  # permute the two last dimensions of hello 
         x = self.conv1(x)
         x = self.flatten(x)
-        print(x.shape)
         x = self.linear(x)
         x = self.relu(x)
         x = self.softmax(x)
@@ -36,10 +35,13 @@ class ModelFPKMDummy(nn.Module):
     def compute_loss(self, loss_fn, output, fpkm):
         return loss_fn(output, fpkm)
     
-    def batch(self, x: dict, y: dict, loss_fn: Callable, optimizer: Callable):
-
+    def batch(self, x: dict, y: dict, loss_fn: Callable, optimizer=None):
         output = self.forward(**x)
         loss = self.compute_loss(loss_fn, output, **y)
+        
+        if optimizer is None:
+            return loss
+        
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

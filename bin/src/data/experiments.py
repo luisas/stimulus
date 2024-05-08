@@ -51,8 +51,8 @@ class DnaToFloatExperiment(AbstractExperiment):
     """
     def __init__(self) -> None:
         super().__init__()
-        self.dna = {'encoder': encoders.TextOneHotEncoder(alphabet='acgt'), 'data_transformation_generators': {'UniformTextMasker': data_transformation_generators.UniformTextMasker(mask='N'), 'ReverseComplement': data_transformation_generators.ReverseComplement()}}
-        self.float = {'encoder': encoders.FloatEncoder(), 'data_transformation_generators': {'GaussianNoise': data_transformation_generators.GaussianNoise()}}
+        self.dna = {'encoder': encoders.TextOneHotEncoder(alphabet='acgt'), 'data_transformation_generators': {}}
+        self.float = {'encoder': encoders.FloatEncoder(), 'data_transformation_generators': {}}
         self.split = {'RandomSplitter': splitters.RandomSplitter()}        
 
 
