@@ -27,7 +27,7 @@ workflow HANDLE_DATA {
     main:
     
     // print the message from the check_model subworkflow 
-    message_from_check.view()
+    //message_from_check.view()
 
     // put the files in channels
     csv  = Channel.fromPath( input_csv  )

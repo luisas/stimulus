@@ -26,14 +26,13 @@ class PredictWrapper():
         """
         self.model.eval()
         predictions = {k:[] for k in list(self.dataloader)[0][1].keys()}
-
         # get the predictions for each batch
         with torch.no_grad():
             for x, y, meta in self.dataloader:
                 current_predictions = self.model.batch(x, y, **self.loss_dict)[1]
                 for k in current_predictions.keys():
                     predictions[k].append(current_predictions[k])
-
+        
         # return the predictions as a dictionary of tensors for the entire dataset
         return {k: torch.cat(v) for k, v in predictions.items()}
 

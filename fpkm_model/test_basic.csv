@@ -1,0 +1,6 @@
+fpkm:label:float,sequence:input:dna,species:meta:str
+1.0,AAAAACCCAAAAAAAA,Homo_sapiens
+1.0,AAAAAAAACCCAAAAA,Homo_sapiens
+0.8,AAAACCAAAAAAAAAA,Homo_sapiens
+0.8,AAAACCAAAAAAAAAA,Homo_sapiens
+0.8,AAAACCAAAAAAAAAA,Homo_sapiens

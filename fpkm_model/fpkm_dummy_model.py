@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-
+from typing import Callable, Tuple, Optional
 from collections.abc import Callable
+
 class ModelFPKMDummy(nn.Module):
     def __init__(self, nfilters_conv1: int = 5, kernel_size_1: int = 3, input_length: int = 1000) -> None:
         super(ModelFPKMDummy, self).__init__()
@@ -29,20 +30,18 @@ class ModelFPKMDummy(nn.Module):
         x = self.linear(x)
         x = self.relu(x)
         x = self.softmax(x)
-        x = x.squeeze()        
-        return x
+        x = x.squeeze()
+        return {"fpkm": x}
     
-    def compute_loss(self, loss_fn, output, fpkm):
+    def compute_loss(self, output: torch.Tensor, fpkm: torch.Tensor, loss_fn: Callable) -> torch.Tensor:
         return loss_fn(output, fpkm)
     
-    def batch(self, x: dict, y: dict, loss_fn: Callable, optimizer=None):
+    def batch(self, x: dict, y: dict, loss_fn: Callable, optimizer: Optional[Callable] = None) -> Tuple[torch.Tensor, dict]:
         output = self.forward(**x)
-        loss = self.compute_loss(loss_fn, output, **y)
-        
-        if optimizer is None:
-            return loss
-        
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        return loss # return the main batch loss, later used for computing the validation
+        loss = self.compute_loss(output["fpkm"], y["fpkm"], loss_fn)
+        if optimizer is not None:
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()        
+        #output = {k:torch.argmax(v, dim = 1) for k,v in output.items()} 
+        return loss,output# return the main batch loss, later used for computing the validation
