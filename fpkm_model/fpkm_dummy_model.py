@@ -4,20 +4,21 @@ from typing import Callable, Tuple, Optional
 from collections.abc import Callable
 
 class ModelFPKMDummy(nn.Module):
-    def __init__(self, nfilters_conv1: int = 5, kernel_size_1: int = 3, input_length: int = 1000) -> None:
+    def __init__(self, nfilters_conv1: int = 5, kernel_size_1: int = 5, input_length: int = 1000) -> None:
         super(ModelFPKMDummy, self).__init__()
         
         
         self.conv1 = nn.Sequential(
                         nn.Conv1d(in_channels = 4, out_channels= nfilters_conv1, kernel_size = kernel_size_1),
                         nn.BatchNorm1d(nfilters_conv1),
-                        nn.ELU()
+                        nn.ELU(),
+                        nn.Dropout(0.3)
                     )
         self.flatten = nn.Flatten()
         
-        #output_length = input_length - kernel_size_1 + 1
+        flattened_output_length = (input_length - kernel_size_1 + 1) * nfilters_conv1
         self.linear = nn.Sequential(
-                            nn.Linear(13780, 1), 
+                            nn.Linear(flattened_output_length, 1), 
                             nn.Softplus()
                     )
         self.relu = nn.ReLU()
@@ -40,8 +41,9 @@ class ModelFPKMDummy(nn.Module):
         output = self.forward(**x)
         loss = self.compute_loss(output["fpkm"], y["fpkm"], loss_fn)
         if optimizer is not None:
+            print("Optimizing")
             optimizer.zero_grad()
             loss.backward()
-            optimizer.step()        
-        #output = {k:torch.argmax(v, dim = 1) for k,v in output.items()} 
+            optimizer.step()
+        print(f"Loss: {loss}")        
         return loss,output# return the main batch loss, later used for computing the validation

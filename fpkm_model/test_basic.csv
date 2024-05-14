@@ -1,6 +1,11 @@
-fpkm:label:float,sequence:input:dna,species:meta:str
-1.0,AAAAACCCAAAAAAAA,Homo_sapiens
-1.0,AAAAAAAACCCAAAAA,Homo_sapiens
-0.8,AAAACCAAAAAAAAAA,Homo_sapiens
-0.8,AAAACCAAAAAAAAAA,Homo_sapiens
-0.8,AAAACCAAAAAAAAAA,Homo_sapiens
+sequence:input:dna,fpkm:label:float,split:split:int,species:meta:str
+CCCCTAAGTC,0,0,Homo_sapiens
+CTATATACTA,1,0,Homo_sapiens
+TATATAGGTA,1,0,Homo_sapiens
+GAGTGTGACT,0,1,Homo_sapiens
+ATGAGATGGC,0,0,Homo_sapiens
+ACCCACAAGT,0,0,Homo_sapiens
+GTATATATTC,1,0,Homo_sapiens
+GTATATAGAG,1,2,Homo_sapiens
+ACACAGTTAG,0,0,Homo_sapiens
+TGGTATATAG,1,0,Homo_sapiens
