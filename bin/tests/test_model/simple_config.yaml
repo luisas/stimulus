@@ -16,7 +16,11 @@ optimizer_params:
 
 data_params:
   batch_size:
+<<<<<<< HEAD
     space: [3]
+=======
+    space: [8, 16]
+>>>>>>> main
     mode: choice
 
 loss_params:
