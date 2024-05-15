@@ -32,14 +32,14 @@ class ModelFPKMDummy(nn.Module):
         x = self.relu(x)
         x = self.softmax(x)
         x = x.squeeze()
-        return {"fpkm": x}
+        return x
     
     def compute_loss(self, output: torch.Tensor, fpkm: torch.Tensor, loss_fn: Callable) -> torch.Tensor:
         return loss_fn(output, fpkm)
     
     def batch(self, x: dict, y: dict, loss_fn: Callable, optimizer: Optional[Callable] = None) -> Tuple[torch.Tensor, dict]:
         output = self.forward(**x)
-        loss = self.compute_loss(output["fpkm"], y["fpkm"], loss_fn)
+        loss = self.compute_loss(output, y, loss_fn)
         if optimizer is not None:
             print("Optimizing")
             optimizer.zero_grad()
