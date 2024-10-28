@@ -7,27 +7,41 @@
     "items": {
         "type": "object",
         "properties": {
-            "sample": {
+            "id": {
                 "type": "string",
                 "pattern": "^\\S+$",
-                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "errorMessage": "ID must be provided and cannot contain spaces",
                 "meta": ["id"]
             },
-            "fastq_1": {
+            "input_data": {
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "pattern": "^\\S+\\.csv$",
+                "errorMessage": "Input data file must be provided and must have a .csv extension. Please refer to the documentation to create this file."
             },
-            "fastq_2": {
+            "experiment_json": {
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
-            }
+                "pattern": "^\\S+\\.json$",
+                "errorMessage": "Experiment json file must be provided and must have a .json extension. Please refer to the documentation to create this file."
+            },
+            "model": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.py$",
+                "errorMessage": "Model architecture must be provided and must have a .py etension."
+            },
+            "tune_config": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.yaml$",
+                "errorMessage": "Tune configuration file must be provided and must have a .yaml extension."
+            
         },
-        "required": ["sample", "fastq_1"]
+        "required": ["id", "input_data", "experiment_json", "model", "tune_config"]
     }
 }
