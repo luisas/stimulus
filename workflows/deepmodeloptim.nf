@@ -24,7 +24,6 @@ include { HANDLE_ANALYSIS        } from '../subworkflows/local/handle_analysis'
 workflow DEEPMODELOPTIM {
 
     take:
-    // ch_samplesheet, // channel: samplesheet read in from --input
     ch_csv
     ch_exp_conf
     ch_model

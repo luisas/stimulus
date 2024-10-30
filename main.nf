@@ -70,15 +70,13 @@ workflow {
         params.validate_params,
         params.monochrome_logs,
         args,
-        params.outdir //,
-        // params.input
+        params.outdir
     )
 
     //
     // WORKFLOW: Run main workflow
     //
     NFCORE_DEEPMODELOPTIM (
-        // PIPELINE_INITIALISATION.out.samplesheet,
         params.csv,
         params.exp_conf,
         params.model,
