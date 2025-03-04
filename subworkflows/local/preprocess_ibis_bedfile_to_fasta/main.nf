@@ -1,5 +1,5 @@
 /**
- * Preprocess BED File to FASTA Workflow
+ * Preprocess IBIS BED file to FASTA format
  *
  * This subworkflow is designed to process a BED file and convert it into FASTA format,
  * preparing datasets for downstream sequence-based classification tasks.
@@ -12,7 +12,7 @@
  *
  * Expected Inputs:
  *   - A channel containing BED file with peak regions.
- *   - A configuration channel providing the necessary details for extracting target 
+ *   - A configuration channel providing the necessary details for extracting target
  *     (foreground) and background.
  *
  * Output:
@@ -24,15 +24,16 @@
  *     should be created as part of the workflow documentation.
  */
 
-include { GAWK as CENTER_AROUND_PEAK                                         } from '../../../modules/nf-core/gawk'
-include { EXTRACT_DATA_CONTENT_BY_COLUMN_VALUES as EXTRACT_FOREGROUND        } from '../../../modules/local/extract_data_content_by_column_values'
-include { EXTRACT_DATA_CONTENT_BY_COLUMN_VALUES as EXTRACT_BACKGROUND_ALIENS } from '../../../modules/local/extract_data_content_by_column_values'
-include { BEDTOOLS_SUBTRACT                                                  } from '../../../modules/nf-core/bedtools/subtract'
-include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_FOREGROUND                  } from '../../../modules/nf-core/bedtools/getfasta'
-include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_BACKGROUND                  } from '../../../modules/nf-core/bedtools/getfasta'
+include { GAWK as CENTER_AROUND_PEAK                        } from '../../../modules/nf-core/gawk'
+include { AWK_EXTRACT as EXTRACT_FOREGROUND                 } from '../../../modules/local/awk/extract'
+include { AWK_EXTRACT as EXTRACT_BACKGROUND_ALIENS          } from '../../../modules/local/awk/extract'
+// include { AWK_SHADE as EXTRACT_BACKGROUND_SHADE             } from '../../../modules/local/awk/shade'
+include { BEDTOOLS_SUBTRACT                                 } from '../../../modules/nf-core/bedtools/subtract'
+include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_FOREGROUND } from '../../../modules/nf-core/bedtools/getfasta'
+include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_BACKGROUND } from '../../../modules/nf-core/bedtools/getfasta'
 
 
-workflow PREPROCESS_BEDFILE_TO_FASTA {
+workflow PREPROCESS_IBIS_BEDFILE_TO_FASTA {
     take:
     ch_input
     ch_config
@@ -47,7 +48,7 @@ workflow PREPROCESS_BEDFILE_TO_FASTA {
     // align peaks
     // ==============================================================================
 
-    // use the GAWK nf-core module for modifying bed start and end values 
+    // use the GAWK nf-core module for modifying bed start and end values
     // based on distance from peak (centering).
 
     ch_input_for_centering = ch_input
@@ -58,7 +59,7 @@ workflow PREPROCESS_BEDFILE_TO_FASTA {
     ch_awk_program = Channel.fromPath('./bin/center_around_peak.sh')
 
     CENTER_AROUND_PEAK(
-        ch_input_for_centering, 
+        ch_input_for_centering,
         ch_awk_program
     )
     ch_input = CENTER_AROUND_PEAK.out.output
@@ -67,10 +68,16 @@ workflow PREPROCESS_BEDFILE_TO_FASTA {
     // extract foreground
     // ==============================================================================
 
+    // prepare the input to extract foreground
+    // Note that same target can be present in multiple configurations of different
+    // background definitions. Hence, here we extract only the relevant information
+    // for foreground and apply unique()
     ch_foreground_ids = ch_config
         .map{ it ->
-            [it, it.variable, it.target]
+            [[id: it.target], it.variable, it.target]
         }
+        .unique()
+
     EXTRACT_FOREGROUND(
         ch_foreground_ids,
         ch_input.collect()
@@ -96,12 +103,22 @@ workflow PREPROCESS_BEDFILE_TO_FASTA {
 
     // extract background - shades
 
-    // extract background - random 
+    // ch_background_ids = ch_input
+    //     .map { meta, input -> input }
+    //     .combine {
+    //         ch_config.filter { it.background_type == 'shade' }
+    //     }
+    //     .map{ input, meta ->
+    //         [meta, input, params.bed_peak_size, meta.gap]
+    //     }
+    // ch_background_ids.view()
+
+    // extract background - random
 
     // merge different background if needed
     // TODO: implement this
     // for the moment use aliens background
-    
+
     ch_background = ch_background_aliens
 
     // run bedtools to remove overlapping peaks

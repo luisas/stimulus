@@ -9,14 +9,14 @@ include { paramsSummaryMap            } from 'plugin/nf-schema'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { softwareVersionsToYAML      } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText      } from '../subworkflows/local/utils_nfcore_deepmodeloptim_pipeline'
-include { CHECK_MODEL_WF              } from '../subworkflows/local/check_model'
-include { PREPROCESS_BEDFILE_TO_FASTA } from '../subworkflows/local/preprocess_bedfile_to_fasta'
-include { SPLIT_DATA_CONFIG_WF        } from '../subworkflows/local/split_data_config'
-include { SPLIT_CSV_WF                } from '../subworkflows/local/split_csv'
-include { TRANSFORM_CSV_WF            } from '../subworkflows/local/transform_csv'
-include { TUNE_WF                     } from '../subworkflows/local/tune'
+include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_deepmodeloptim_pipeline'
+include { CHECK_MODEL_WF                   } from '../subworkflows/local/check_model'
+include { PREPROCESS_IBIS_BEDFILE_TO_FASTA } from '../subworkflows/local/preprocess_ibis_bedfile_to_fasta'
+include { SPLIT_DATA_CONFIG_WF             } from '../subworkflows/local/split_data_config'
+include { SPLIT_CSV_WF                     } from '../subworkflows/local/split_csv'
+include { TRANSFORM_CSV_WF                 } from '../subworkflows/local/transform_csv'
+include { TUNE_WF                          } from '../subworkflows/local/tune'
 
 //
 // MODULES: Consisting of nf-core/modules
@@ -48,25 +48,31 @@ workflow DEEPMODELOPTIM {
     // preprocess data
     // ==============================================================================
 
-    // TODO load preprocessing yaml config
-    // this is only temporary for testing purposes
-
-    ch_preprocessing_config = Channel.of(
-        [id:'ZNF367_aliens', variable:'tf_name', target:'ZNF367', background:'LEUTX,ZNF395', background_type:'aliens'],
-        [id:'LEUTX_aliens', variable:'tf_name', target:'LEUTX', background:'ZNF367,ZNF395', background_type:'aliens'],
-        [id:'ZNF395_aliens', variable:'tf_name', target:'ZNF395', background:'ZNF367,LEUTX', background_type:'aliens']
-    )
-
     // create genome index
 
     CUSTOM_GETCHROMSIZES(ch_genome)
     ch_genome_sizes = CUSTOM_GETCHROMSIZES.out.sizes
 
+    // TODO load preprocessing yaml config
+    // this is only temporary for testing purposes
+
+    ch_preprocessing_config = Channel.of(
+            [id:'ZNF367_aliens', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'aliens', variable:'tf_name', target:'ZNF367', background:'LEUTX,ZNF395'],
+            [id:'LEUTX_aliens', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'aliens', variable:'tf_name', target:'LEUTX', background:'ZNF367,ZNF395'],
+            [id:'ZNF395_aliens', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'aliens', variable:'tf_name', target:'ZNF395', background:'ZNF367,LEUTX'],
+            [id:'ZNF367_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'ZNF367', gap: 300],
+            [id:'LEUTX_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'LEUTX', gap: 300],
+            [id:'ZNF395_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'ZNF395', gap: 300]
+        )
+        .branch {
+            preprocess_ibis_bedfile_to_fasta: it.protocol == 'preprocess_ibis_bedfile_to_fasta'
+        }
+
     // preprocess bedfile into fasta sequences
 
-    PREPROCESS_BEDFILE_TO_FASTA(
+    PREPROCESS_IBIS_BEDFILE_TO_FASTA(
         ch_data,
-        ch_preprocessing_config,
+        ch_preprocessing_config.preprocess_ibis_bedfile_to_fasta,
         ch_genome,
         ch_genome_sizes
     )

@@ -1,11 +1,12 @@
-process EXTRACT_DATA_CONTENT_BY_COLUMN_VALUES {
+process AWK_EXTRACT {
     tag "$meta.id"
     label 'process_single'
 
+    // add conda environment
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/ubuntu:20.04' :
         'nf-core/ubuntu:20.04' }"
-    
+
     input:
     tuple val(meta), val(column_name), val(values)
     tuple val(meta2), path(data)
