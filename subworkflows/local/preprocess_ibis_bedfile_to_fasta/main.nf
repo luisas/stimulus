@@ -9,6 +9,7 @@
  *   2. Extract foreground (target).
  *   3. Extract background (aliens, shades, random).
  *   4. Convert the processed peaks into FASTA format.
+ *   5. Convert the extracted sequences into a stimulus input CSV format.
  *
  * Expected Inputs:
  *   - A channel containing BED file with peak regions.
@@ -19,7 +20,7 @@
  *   - A FASTA formatted file containing sequences for both the target (foreground) and
  *     the corresponding background regions.
  *
- * Note:
+ * TODO:
  *   - A meta.yaml file describing the workflow configuration, metadata, and dependencies
  *     should be created as part of the workflow documentation.
  */
@@ -27,10 +28,11 @@
 include { GAWK as CENTER_AROUND_PEAK                        } from '../../../modules/nf-core/gawk'
 include { AWK_EXTRACT as EXTRACT_FOREGROUND                 } from '../../../modules/local/awk/extract'
 include { AWK_EXTRACT as EXTRACT_BACKGROUND_ALIENS          } from '../../../modules/local/awk/extract'
-// include { AWK_SHADE as EXTRACT_BACKGROUND_SHADE             } from '../../../modules/local/awk/shade'
+include { BEDTOOLS_SHIFT as EXTRACT_BACKGROUND_SHADE        } from '../../../modules/nf-core/bedtools/shift'
 include { BEDTOOLS_SUBTRACT                                 } from '../../../modules/nf-core/bedtools/subtract'
 include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_FOREGROUND } from '../../../modules/nf-core/bedtools/getfasta'
 include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_BACKGROUND } from '../../../modules/nf-core/bedtools/getfasta'
+include { GAWK as BACKGROUND_FOREGROUND_TO_STIMULUS_CSV     } from '../../../modules/nf-core/gawk'
 
 
 workflow PREPROCESS_IBIS_BEDFILE_TO_FASTA {
@@ -74,7 +76,7 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_FASTA {
     // for foreground and apply unique()
     ch_foreground_ids = ch_config
         .map{ it ->
-            [[id: it.target], it.variable, it.target]
+            [[id: it.target, variable: it.variable, target: it.target], it.variable, it.target]
         }
         .unique()
 
@@ -90,43 +92,60 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_FASTA {
 
     // extract background - aliens
 
-    ch_background_ids = ch_config
+    ch_background_for_aliens = ch_config
         .filter { it.background_type == 'aliens' }
         .map{ it ->
             [it, it.variable, it.background]
         }
+
     EXTRACT_BACKGROUND_ALIENS(
-        ch_background_ids,
+        ch_background_for_aliens,
         ch_input.collect()
     )
     ch_background_aliens = EXTRACT_BACKGROUND_ALIENS.out.extracted_data
 
     // extract background - shades
+    // this option creates a background with peaks located at a nearby region from
+    // the foreground peaks
 
-    // ch_background_ids = ch_input
-    //     .map { meta, input -> input }
-    //     .combine {
-    //         ch_config.filter { it.background_type == 'shade' }
-    //     }
-    //     .map{ input, meta ->
-    //         [meta, input, params.bed_peak_size, meta.gap]
-    //     }
-    // ch_background_ids.view()
+    ch_background_for_shade = ch_config
+        .filter { it.background_type == 'shade' }
+        .combine( ch_foreground )
+        .map { meta, meta_input, input ->
+            if ((meta.variable == meta_input.variable) &&
+                (meta.target == meta_input.target)) {
+                return [meta, input]
+            }
+        }
+
+    EXTRACT_BACKGROUND_SHADE(
+        ch_background_for_shade,
+        ch_genome_sizes.collect()
+    )
+    ch_background_shade = EXTRACT_BACKGROUND_SHADE.out.bed
 
     // extract background - random
 
     // merge different background if needed
     // TODO: implement this
-    // for the moment use aliens background
+    // for the moment just mix everything
 
     ch_background = ch_background_aliens
+        .mix(ch_background_shade)
 
     // run bedtools to remove overlapping peaks
     // this creates a clean background with no overlapping peaks with the foreground
 
-    BEDTOOLS_SUBTRACT(
-        ch_background.join(ch_foreground)
-    )
+    ch_background_with_foreground = ch_background
+        .combine(ch_foreground)
+        .map{ meta_bg, bg, meta_fg, fg ->
+            if ((meta_bg.variable == meta_fg.variable) &&
+                (meta_bg.target == meta_fg.target)) {
+                return [meta_bg, bg, fg]
+            }
+        }
+
+    BEDTOOLS_SUBTRACT(ch_background_with_foreground)
     ch_background = BEDTOOLS_SUBTRACT.out.bed
 
     // ==============================================================================
@@ -137,15 +156,36 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_FASTA {
 
     BEDTOOLS_GETFASTA_FOREGROUND(
         ch_foreground,
-        ch_genome.map{it[1]}
+        ch_genome.map{it[1]}.collect()
     )
 
     BEDTOOLS_GETFASTA_BACKGROUND(
         ch_background,
-        ch_genome.map{it[1]}
+        ch_genome.map{it[1]}.collect()
+    )
+
+    ch_foreground = BEDTOOLS_GETFASTA_FOREGROUND.out.fasta
+    ch_background = BEDTOOLS_GETFASTA_BACKGROUND.out.fasta
+
+    // ==============================================================================
+    // convert to stimulus input csv format
+    // ==============================================================================
+
+    ch_input_for_formatting = ch_background
+        .combine(ch_foreground)
+        .map{ meta_bg, bg, meta_fg, fg ->
+            if ((meta_bg.variable == meta_fg.variable) &&
+                (meta_bg.target == meta_fg.target)) {
+                return [meta_bg, [bg, fg]]
+            }
+        }
+    ch_awk_program = Channel.fromPath('./bin/background_foreground_to_stimulus_csv.sh')
+
+    BACKGROUND_FOREGROUND_TO_STIMULUS_CSV(
+        ch_input_for_formatting,
+        ch_awk_program.collect()
     )
 
     emit:
-    foreground = BEDTOOLS_GETFASTA_FOREGROUND.out.fasta
-    background = BEDTOOLS_GETFASTA_BACKGROUND.out.fasta
+    data = BACKGROUND_FOREGROUND_TO_STIMULUS_CSV.out.output
 }

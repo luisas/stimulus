@@ -60,9 +60,9 @@ workflow DEEPMODELOPTIM {
             [id:'ZNF367_aliens', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'aliens', variable:'tf_name', target:'ZNF367', background:'LEUTX,ZNF395'],
             [id:'LEUTX_aliens', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'aliens', variable:'tf_name', target:'LEUTX', background:'ZNF367,ZNF395'],
             [id:'ZNF395_aliens', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'aliens', variable:'tf_name', target:'ZNF395', background:'ZNF367,LEUTX'],
-            [id:'ZNF367_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'ZNF367', gap: 300],
-            [id:'LEUTX_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'LEUTX', gap: 300],
-            [id:'ZNF395_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'ZNF395', gap: 300]
+            [id:'ZNF367_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'ZNF367', shade_args: "-s 300"],
+            [id:'LEUTX_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'LEUTX', shade_args: "-s 300"],
+            [id:'ZNF395_shade', protocol:'preprocess_ibis_bedfile_to_fasta', background_type:'shade', variable:'tf_name', target:'ZNF395', shade_args: "-s 300"]
         )
         .branch {
             preprocess_ibis_bedfile_to_fasta: it.protocol == 'preprocess_ibis_bedfile_to_fasta'
