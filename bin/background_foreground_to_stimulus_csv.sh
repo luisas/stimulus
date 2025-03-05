@@ -1,5 +1,5 @@
 BEGIN {
-    print "dna,binding"
+    print "dna,binding," column_name
 }
 
 # Process background file (first file)
@@ -7,7 +7,7 @@ FNR==NR {
     if (!/^>/) {
         gsub(/[[:space:]]/,"")
         if (length($0) > 0) {
-            print $0 ",0"
+            print $0 ",0,"
         }
     }
     next
@@ -17,6 +17,6 @@ FNR==NR {
 !/^>/ {
     gsub(/[[:space:]]/,"")
     if (length($0) > 0) {
-        print $0 ",1"
+        print $0 ",1," column_value
     }
 }
