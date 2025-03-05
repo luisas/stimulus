@@ -1,5 +1,5 @@
 BEGIN {
-    print "sequence,label"
+    print "dna,binding"
 }
 
 # Process background file (first file)
