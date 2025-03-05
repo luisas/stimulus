@@ -1,7 +1,7 @@
 /**
- * Preprocess IBIS BED file to FASTA format
+ * Preprocess IBIS BED file to STIMULUS format
  *
- * This subworkflow is designed to process a BED file and convert it into FASTA format,
+ * This subworkflow is designed to process a BED file and convert it into STIMULUS format,
  * preparing datasets for downstream sequence-based classification tasks.
  *
  * Workflow Steps:
@@ -17,7 +17,7 @@
  *     (foreground) and background.
  *
  * Output:
- *   - A FASTA formatted file containing sequences for both the target (foreground) and
+ *   - A STIMULUS formatted file containing sequences for both the target (foreground) and
  *     the corresponding background regions.
  *
  * TODO:
@@ -35,7 +35,7 @@ include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_BACKGROUND } from '../../../mod
 include { GAWK as BACKGROUND_FOREGROUND_TO_STIMULUS_CSV     } from '../../../modules/nf-core/gawk'
 
 
-workflow PREPROCESS_IBIS_BEDFILE_TO_FASTA {
+workflow PREPROCESS_IBIS_BEDFILE_TO_STIMULUS {
     take:
     ch_input
     ch_config
