@@ -2,10 +2,10 @@ process AWK_EXTRACT {
     tag "$meta.id"
     label 'process_single'
 
-    // add conda environment
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/ubuntu:20.04' :
-        'nf-core/ubuntu:20.04' }"
+        'https://depot.galaxyproject.org/singularity/gawk:5.3.0' :
+        'biocontainers/gawk:5.3.0' }"
 
     input:
     tuple val(meta), val(column_name), val(values)
@@ -50,7 +50,7 @@ process AWK_EXTRACT {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bash: \$(echo \$(bash --version | grep -Eo 'version [[:alnum:].]+' | sed 's/version //'))
+        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
     END_VERSIONS
     """
 
@@ -61,7 +61,7 @@ process AWK_EXTRACT {
     touch ${prefix}.${extension}
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        bash: \$(echo \$(bash --version | grep -Eo 'version [[:alnum:].]+' | sed 's/version //'))
+        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
     END_VERSIONS
     """
 }
