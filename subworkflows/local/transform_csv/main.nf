@@ -15,7 +15,8 @@ include { STIMULUS_TRANSFORM_CSV } from '../../../modules/local/stimulus_transfo
 workflow TRANSFORM_CSV_WF {
 
     take:
-    ch_split_data_with_sub_config
+    ch_split_data
+    ch_sub_config
 
     main:
     // TODO add strategy for handling the launch of stimulus noiser as well as NF-core and other modules
@@ -25,7 +26,18 @@ workflow TRANSFORM_CSV_WF {
     // Transform data using stimulus
     // ==============================================================================
 
-    STIMULUS_TRANSFORM_CSV(ch_split_data_with_sub_config)
+    // combine all against all data vs configs
+    ch_input = ch_split_data
+        .combine(ch_sub_config)
+        .multiMap{ meta_data, data, meta_config, config ->
+            data: [meta_data, data]
+            config: [meta_config, config]
+        }
+
+    STIMULUS_TRANSFORM_CSV(
+        ch_input.data,
+        ch_input.config
+    )
     ch_transformed_data = STIMULUS_TRANSFORM_CSV.out.transformed_data
 
     emit:

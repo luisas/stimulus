@@ -1,0 +1,75 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/schemas/schema_preprocessing.json",
+    "title": "nf-core/differentialabundance pipeline - params.data_preprocessing schema",
+    "description": "Schema for the file provided with params.data_preprocessing",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "meta": ["id"]
+            },
+            "protocol": {
+                "type": "string",
+                "enum": ["ibis"],
+                "meta": ["protocol"]
+            },
+            "background_type": {
+                "type": "string",
+                "enum": ["aliens", "shade"],
+                "meta": ["background_type"]
+            },
+            "variable": {
+                "type": "string",
+                "meta": ["variable"]
+            },
+            "target": {
+                "type": "string",
+                "meta": ["target"]
+            },
+            "background": {
+                "type": "string",
+                "meta": ["background"],
+                "default": ""
+            },
+            "shade_args": {
+                "type": "string",
+                "meta": ["shade_args"],
+                "default": ""
+            }
+        },
+        "required": [
+            "id",
+            "protocol"
+        ],
+        "allOf": [
+            {
+                "if": {
+                "properties": { "protocol": { "const": "ibis" } }
+                },
+                "then": {
+                "required": ["background_type", "variable", "target"]
+                }
+            },
+            {
+                "if": {
+                "properties": { "background_type": { "const": "aliens" } }
+                },
+                "then": {
+                "required": ["background"]
+                }
+            },
+            {
+                "if": {
+                "properties": { "background_type": { "const": "shade" } }
+                },
+                "then": {
+                "required": ["shade_args"]
+                }
+            }
+        ],
+        "additionalProperties": false
+    }
+}

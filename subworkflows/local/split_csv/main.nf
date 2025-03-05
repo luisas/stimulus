@@ -25,8 +25,8 @@ workflow SPLIT_CSV_WF {
     // ==============================================================================
 
     STIMULUS_SPLIT_DATA(
-        ch_yaml_sub_config,
-        ch_data
+        ch_data,
+        ch_yaml_sub_config
     )
     ch_split_data = STIMULUS_SPLIT_DATA.out.csv_with_split
 

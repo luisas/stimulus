@@ -7,7 +7,7 @@ NR==FNR { chrom_sizes[$1] = $2; next; }
 {
     mid = $4;                  # extract peak piosition
     left = int(N/2);           # Floor division for left padding
-    right = N - left - 1;      # Ensures total length is exactly N
+    right = N - left;          # Ensures total length is exactly N
 
     # the new start and end values
     start = mid - left;
