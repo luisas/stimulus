@@ -36,6 +36,7 @@ workflow PIPELINE_INITIALISATION {
     model
     model_config
     initial_weights
+    preprocessing_config
 
     main:
 
@@ -84,6 +85,14 @@ workflow PIPELINE_INITIALISATION {
             .map { it -> [[id:it.baseName], it]}
 
     //
+    // Create channel with data preprocessing config
+    // TODO: improve the schema so that it will not output a meta and an empty array
+    //
+    ch_preprocessing_config = params.preprocessing_config == null ?
+        Channel.empty() :
+        Channel.fromList(samplesheetToList(params.preprocessing_config, "assets/schema_preprocessing.json")).map{it[0]}
+
+    //
     // Create channels needed for preprocessing protocols
     //
     ch_genome = params.genome == null ?
@@ -92,13 +101,14 @@ workflow PIPELINE_INITIALISATION {
             .map { it -> [[id:params.genome], it]}
 
     emit:
-    data            = ch_data
-    data_config     = ch_data_config
-    model           = ch_model
-    model_config    = ch_model_config
-    initial_weights = ch_initial_weights
-    genome          = ch_genome
-    versions        = ch_versions
+    data                 = ch_data
+    data_config          = ch_data_config
+    model                = ch_model
+    model_config         = ch_model_config
+    initial_weights      = ch_initial_weights
+    preprocessing_config = ch_preprocessing_config
+    genome               = ch_genome
+    versions             = ch_versions
 }
 
 /*

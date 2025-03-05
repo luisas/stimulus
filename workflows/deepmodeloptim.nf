@@ -18,12 +18,7 @@ include { TUNE_WF                             } from '../subworkflows/local/tune
 //
 // MODULES: Consisting of nf-core/modules
 //
-include { CUSTOM_GETCHROMSIZES        } from '../modules/nf-core/custom/getchromsizes'
-
-//
-// FUNCTIONS
-//
-include { paramsSummaryMap            } from 'plugin/nf-schema'
+include { CUSTOM_GETCHROMSIZES                } from '../modules/nf-core/custom/getchromsizes'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,6 +34,7 @@ workflow DEEPMODELOPTIM {
     ch_model
     ch_model_config
     ch_initial_weights
+    ch_preprocessing_config
     ch_genome
 
     main:
@@ -50,37 +46,18 @@ workflow DEEPMODELOPTIM {
     // preprocess data
     // ==============================================================================
 
-    // TODO set preprocessing step to true if preprocessing config is provided
-    // for the moment just set true
-    preprocessing = true
-
-    if (preprocessing) {
+    if (params.preprocessing_config) {
 
         // create genome index
 
         CUSTOM_GETCHROMSIZES(ch_genome)
         ch_genome_sizes = CUSTOM_GETCHROMSIZES.out.sizes
 
-        // TODO load preprocessing yaml config
-        // this is only temporary for testing purposes
-
-        ch_preprocessing_config = Channel.of(
-                [id:'ZNF367_aliens', protocol:'preprocess_ibis_bedfile_to_stimulus', background_type:'aliens', variable:'tf_name', target:'ZNF367', background:'LEUTX,ZNF395'],
-                [id:'LEUTX_aliens', protocol:'preprocess_ibis_bedfile_to_stimulus', background_type:'aliens', variable:'tf_name', target:'LEUTX', background:'ZNF367,ZNF395'],
-                [id:'ZNF395_aliens', protocol:'preprocess_ibis_bedfile_to_stimulus', background_type:'aliens', variable:'tf_name', target:'ZNF395', background:'ZNF367,LEUTX'],
-                [id:'ZNF367_shade', protocol:'preprocess_ibis_bedfile_to_stimulus', background_type:'shade', variable:'tf_name', target:'ZNF367', shade_args: "-s 300"],
-                [id:'LEUTX_shade', protocol:'preprocess_ibis_bedfile_to_stimulus', background_type:'shade', variable:'tf_name', target:'LEUTX', shade_args: "-s 300"],
-                [id:'ZNF395_shade', protocol:'preprocess_ibis_bedfile_to_stimulus', background_type:'shade', variable:'tf_name', target:'ZNF395', shade_args: "-s 300"]
-            )
-            .branch {
-                preprocess_ibis_bedfile_to_stimulus: it.protocol == 'preprocess_ibis_bedfile_to_stimulus'
-            }
-
         // preprocess bedfile into stimulus format
 
         PREPROCESS_IBIS_BEDFILE_TO_STIMULUS(
             ch_data,
-            ch_preprocessing_config.preprocess_ibis_bedfile_to_stimulus,
+            ch_preprocessing_config.filter{it.protocol == 'ibis'},
             ch_genome,
             ch_genome_sizes
         )

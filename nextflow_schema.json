@@ -3,7 +3,13 @@
     "$id": "https://raw.githubusercontent.com/nf-core/deepmodeloptim/master/nextflow_schema.json",
     "title": "nf-core/deepmodeloptim pipeline parameters",
     "description": "nf-core/deepmodeloptim is an end-to-end nextflow based pipeline for statistically testing training procedures of machine learning models",
-    "required": ["data", "data_config", "model", "model_config", "outdir"],
+    "required": [
+        "data",
+        "data_config",
+        "model",
+        "model_config",
+        "outdir"
+    ],
     "type": "object",
     "$defs": {
         "input_output_options": {
@@ -52,7 +58,6 @@
                 },
                 "save_data": {
                     "type": "boolean",
-                    "default": false,
                     "help_text": "flag to save transformed csv data."
                 },
                 "email": {
@@ -214,7 +219,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -277,12 +289,27 @@
         {
             "$ref": "#/$defs/skip_options"
         },
-
         {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
             "$ref": "#/$defs/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "preprocessing_config": {
+            "type": "string"
+        },
+        "genome": {
+            "type": "string"
+        },
+        "igenomes_base": {
+            "type": "string",
+            "default": "s3://ngi-igenomes/igenomes"
+        },
+        "bed_peak_size": {
+            "type": "integer",
+            "default": 300
+        }
+    }
 }

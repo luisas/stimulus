@@ -36,6 +36,7 @@ workflow NFCORE_DEEPMODELOPTIM {
         model
         model_config
         initial_weights
+        preprocessing_config
         genome
 
     main:
@@ -49,6 +50,7 @@ workflow NFCORE_DEEPMODELOPTIM {
         model,
         model_config,
         initial_weights,
+        preprocessing_config,
         genome
     )
 }
@@ -76,7 +78,8 @@ workflow {
         params.data_config,
         params.model,
         params.model_config,
-        params.initial_weights
+        params.initial_weights,
+        params.preprocessing_config
     )
 
     //
@@ -88,6 +91,7 @@ workflow {
         PIPELINE_INITIALISATION.out.model,
         PIPELINE_INITIALISATION.out.model_config,
         PIPELINE_INITIALISATION.out.initial_weights,
+        PIPELINE_INITIALISATION.out.preprocessing_config,
         PIPELINE_INITIALISATION.out.genome
     )
 
