@@ -107,12 +107,10 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_STIMULUS {
     )
     ch_background_aliens = EXTRACT_BACKGROUND_ALIENS.out.extracted_data
 
-    // extract background - shades
-    // this option creates a background with peaks located at a nearby region from
-    // the foreground peaks
+    // create input channel for shade and shuffle
+    // as they use the same input structure
 
-    ch_background_for_shade = ch_config
-        .filter { it.background_type == 'shade' }
+    ch_background_to_extract = ch_config
         .combine( ch_foreground )
         .map { meta, meta_input, input ->
             if ((meta.variable == meta_input.variable) &&
@@ -120,27 +118,26 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_STIMULUS {
                 return [meta, input]
             }
         }
+        .branch {
+            shade: it[0].background_type == 'shade'
+            shuffle: it[0].background_type == 'shuffle'
+        }
+
+    // extract background - shades
+    // this option creates a background with peaks located at a nearby region from
+    // the foreground peaks
 
     EXTRACT_BACKGROUND_SHADE(
-        ch_background_for_shade,
+        ch_background_to_extract.shade,
         ch_genome_sizes.collect()
     )
     ch_background_shade = EXTRACT_BACKGROUND_SHADE.out.bed
 
     // extract background - shuffle
-
-    ch_background_for_shuffle = ch_config
-        .filter { it.background_type == 'shuffle' }
-        .combine ( ch_foreground )
-        .map { meta, meta_input, input ->
-            if ((meta.variable == meta_input.variable) &&
-                (meta.target == meta_input.target)) {
-                return [meta, input]
-            }
-        }
+    // this option creates a background with randomly shuffled peaks
 
     EXTRACT_BACKGROUND_SHUFFLE(
-        ch_background_for_shuffle,
+        ch_background_to_extract.shuffle,
         ch_genome_sizes.collect()
     )
     ch_background_shuffle = EXTRACT_BACKGROUND_SHUFFLE.out.bed
