@@ -1,5 +1,5 @@
-process BEDTOOLS_RANDOM_SAMPLING {
-    tag "${meta.id}"
+process BEDTOOLS_SHUFFLE {
+    tag "$meta.id"
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
@@ -8,12 +8,12 @@ process BEDTOOLS_RANDOM_SAMPLING {
         'biocontainers/bedtools:2.31.1--h13024bc_3' }"
 
     input:
-    tuple val(meta), path(genome_file)
-    tuple val(number_sequences), val(length_sequences)
+    tuple val(meta), path(bed)
+    tuple val(meta2), path(genome_sizes)
 
     output:
-    tuple val(meta), path "*.bed", emit: bed
-    path "versions.yml"          , emit: versions
+    tuple val(meta), path("*.bed"), emit: bed
+    path "versions.yml"           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,10 +22,9 @@ process BEDTOOLS_RANDOM_SAMPLING {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    bedtools random \\
-        -l $length_sequences \\
-        -n $number_sequences \\
-        -g $genome_file \\
+    bedtools shuffle \\
+        -i $bed \\
+        -g $genome_sizes \\
         $args \\
         > ${prefix}.bed
 
@@ -36,6 +35,7 @@ process BEDTOOLS_RANDOM_SAMPLING {
     """
 
     stub:
+    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     touch ${prefix}.bed

@@ -18,7 +18,7 @@
             },
             "background_type": {
                 "type": "string",
-                "enum": ["aliens", "shade"],
+                "enum": ["aliens", "shade", "shuffle"],
                 "meta": ["background_type"]
             },
             "variable": {

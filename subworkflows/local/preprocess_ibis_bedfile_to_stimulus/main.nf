@@ -15,6 +15,8 @@
  *   - A channel containing BED file with peak regions.
  *   - A configuration channel providing the necessary details for extracting target
  *     (foreground) and background.
+ *   - A channel containing the genome FASTA file.
+ *   - A channel containing the genome sizes file.
  *
  * Output:
  *   - A STIMULUS formatted file containing sequences for both the target (foreground) and
@@ -29,6 +31,7 @@ include { GAWK as CENTER_AROUND_PEAK                        } from '../../../mod
 include { AWK_EXTRACT as EXTRACT_FOREGROUND                 } from '../../../modules/local/awk/extract'
 include { AWK_EXTRACT as EXTRACT_BACKGROUND_ALIENS          } from '../../../modules/local/awk/extract'
 include { BEDTOOLS_SHIFT as EXTRACT_BACKGROUND_SHADE        } from '../../../modules/nf-core/bedtools/shift'
+include { BEDTOOLS_SHUFFLE as EXTRACT_BACKGROUND_SHUFFLE    } from '../../../modules/local/bedtools/shuffle'
 include { BEDTOOLS_SUBTRACT                                 } from '../../../modules/nf-core/bedtools/subtract'
 include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_FOREGROUND } from '../../../modules/nf-core/bedtools/getfasta'
 include { BEDTOOLS_GETFASTA as BEDTOOLS_GETFASTA_BACKGROUND } from '../../../modules/nf-core/bedtools/getfasta'
@@ -104,12 +107,10 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_STIMULUS {
     )
     ch_background_aliens = EXTRACT_BACKGROUND_ALIENS.out.extracted_data
 
-    // extract background - shades
-    // this option creates a background with peaks located at a nearby region from
-    // the foreground peaks
+    // create input channel for shade and shuffle
+    // as they use the same input structure
 
-    ch_background_for_shade = ch_config
-        .filter { it.background_type == 'shade' }
+    ch_background_to_extract = ch_config
         .combine( ch_foreground )
         .map { meta, meta_input, input ->
             if ((meta.variable == meta_input.variable) &&
@@ -117,14 +118,29 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_STIMULUS {
                 return [meta, input]
             }
         }
+        .branch {
+            shade: it[0].background_type == 'shade'
+            shuffle: it[0].background_type == 'shuffle'
+        }
+
+    // extract background - shades
+    // this option creates a background with peaks located at a nearby region from
+    // the foreground peaks
 
     EXTRACT_BACKGROUND_SHADE(
-        ch_background_for_shade,
+        ch_background_to_extract.shade,
         ch_genome_sizes.collect()
     )
     ch_background_shade = EXTRACT_BACKGROUND_SHADE.out.bed
 
-    // extract background - random
+    // extract background - shuffle
+    // this option creates a background with randomly shuffled peaks
+
+    EXTRACT_BACKGROUND_SHUFFLE(
+        ch_background_to_extract.shuffle,
+        ch_genome_sizes.collect()
+    )
+    ch_background_shuffle = EXTRACT_BACKGROUND_SHUFFLE.out.bed
 
     // merge different background if needed
     // TODO: implement this
@@ -132,6 +148,7 @@ workflow PREPROCESS_IBIS_BEDFILE_TO_STIMULUS {
 
     ch_background = ch_background_aliens
         .mix(ch_background_shade)
+        .mix(ch_background_shuffle)
 
     // run bedtools to remove overlapping peaks
     // this creates a clean background with no overlapping peaks with the foreground
