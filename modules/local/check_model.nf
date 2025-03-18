@@ -37,5 +37,10 @@ process CHECK_MODEL {
     stub:
     """
     echo passing check-model stub
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 }

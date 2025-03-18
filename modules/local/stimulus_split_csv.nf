@@ -20,11 +20,21 @@ process STIMULUS_SPLIT_DATA {
         -c ${data} \
         -y ${sub_config} \
         -o ${prefix}.csv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 
     stub:
     prefix = task.ext.prefix ?: "${meta.id}-split-${meta2.id}"
     """
     touch ${prefix}.csv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 }

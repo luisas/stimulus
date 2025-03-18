@@ -15,6 +15,11 @@ process STIMULUS_SPLIT_SPLIT {
     script:
     """
     stimulus split-split -y ${data_config}
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 
     stub:
@@ -22,5 +27,10 @@ process STIMULUS_SPLIT_SPLIT {
     touch test_0.yaml
     touch test_1.yaml
     touch test_2.yaml
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 }

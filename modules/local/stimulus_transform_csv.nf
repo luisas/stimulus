@@ -20,11 +20,21 @@ process STIMULUS_TRANSFORM_CSV {
         -c ${data} \
         -y ${config} \
         -o ${prefix}.csv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 
     stub:
     prefix = task.ext.prefix ?: "${meta.id}-${meta2.id}-trans"
     """
     touch ${prefix}.csv
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 }

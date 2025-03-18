@@ -27,6 +27,11 @@ process STIMULUS_TUNE {
         -o ${prefix}-best-model.safetensors \
         -bo ${prefix}-best-optimizer.opt \
         ${args}
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 
     stub:
@@ -35,5 +40,10 @@ process STIMULUS_TUNE {
     touch ${prefix}-best-model.safetensors
     touch ${prefix}-best-optimizer.opt
     touch TuneModel_stub.txt
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 }
