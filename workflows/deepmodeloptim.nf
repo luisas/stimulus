@@ -122,7 +122,6 @@ workflow DEEPMODELOPTIM {
         ch_initial_weights
     )
 
-    
     // Software versions collation remains as comments
     softwareVersionsToYAML(ch_versions)
         .collectFile(
@@ -135,7 +134,6 @@ workflow DEEPMODELOPTIM {
 
     emit:
     versions = ch_versions  // channel: [ path(versions.yml) ]
-    
 
 }
 

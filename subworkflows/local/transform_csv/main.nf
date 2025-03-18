@@ -23,8 +23,8 @@ workflow TRANSFORM_CSV_WF {
     // TODO if the option is parellalization (for the above) then add csv column splitting  noising  merging
 
     // modify the meta for the combining
-    ch_sub_config.map{ 
-            meta, yaml -> [ [id: meta.id, split_id: meta.split_id], meta, yaml] 
+    ch_sub_config.map{
+            meta, yaml -> [ [id: meta.id, split_id: meta.split_id], meta, yaml]
         }.set{ ch_sub_config }
 
     // ==============================================================================
