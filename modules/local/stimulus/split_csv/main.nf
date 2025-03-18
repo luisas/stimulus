@@ -1,4 +1,3 @@
-
 process STIMULUS_SPLIT_DATA {
 
     tag "${meta.id}-${meta2.id}"

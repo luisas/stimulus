@@ -40,33 +40,30 @@
                 "default": ""
             }
         },
-        "required": [
-            "id",
-            "protocol"
-        ],
+        "required": ["id", "protocol"],
         "allOf": [
             {
                 "if": {
-                "properties": { "protocol": { "const": "ibis" } }
+                    "properties": { "protocol": { "const": "ibis" } }
                 },
                 "then": {
-                "required": ["background_type", "variable", "target"]
+                    "required": ["background_type", "variable", "target"]
                 }
             },
             {
                 "if": {
-                "properties": { "background_type": { "const": "aliens" } }
+                    "properties": { "background_type": { "const": "aliens" } }
                 },
                 "then": {
-                "required": ["background"]
+                    "required": ["background"]
                 }
             },
             {
                 "if": {
-                "properties": { "background_type": { "const": "shade" } }
+                    "properties": { "background_type": { "const": "shade" } }
                 },
                 "then": {
-                "required": ["shade_args"]
+                    "required": ["shade_args"]
                 }
             }
         ],

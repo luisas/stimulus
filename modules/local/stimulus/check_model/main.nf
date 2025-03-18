@@ -1,4 +1,3 @@
-
 process CHECK_MODEL {
 
     tag "check model"
