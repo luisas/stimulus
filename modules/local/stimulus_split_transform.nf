@@ -14,7 +14,7 @@ process STIMULUS_SPLIT_TRANSFORM {
 
     script:
     """
-    stimulus split-split -y ${data_config}
+    stimulus split-transform -y ${data_config}
     """
 
     stub:

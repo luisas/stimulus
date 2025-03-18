@@ -1,5 +1,5 @@
 
-process SSTIMULUS_SPLIT_SPLIT {
+process STIMULUS_SPLIT_SPLIT {
 
     tag "$meta.id"
     label 'process_low'

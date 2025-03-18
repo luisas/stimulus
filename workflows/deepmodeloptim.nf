@@ -70,47 +70,53 @@ workflow DEEPMODELOPTIM {
     // split meta yaml split config file into individual yaml files
     // ==============================================================================
 
+    ch_data_config.view()
+
     SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
-    ch_yaml_sub_config = SPLIT_DATA_CONFIG_WF.out.sub_config
+    ch_yaml_sub_config = SPLIT_DATA_CONFIG_SPLIT_WF.out.sub_config
+
+    ch_yaml_sub_config.view()
 
 
     // ==============================================================================
     // split csv data file
     // ==============================================================================
 
-    SPLIT_CSV_WF(
-        ch_data,
-        ch_yaml_sub_config
-    )
-    ch_split_data = SPLIT_CSV_WF.out.split_data
+    // SPLIT_CSV_WF(
+    //     ch_data,
+    //     ch_yaml_sub_config
+    // )
+    // ch_split_data = SPLIT_CSV_WF.out.split_data
+
+    // ch_split_data.view()
 
     // ==============================================================================
     // split meta yaml transform config file into individual yaml files
     // ==============================================================================
-    SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
-    ch_yaml_sub_config = SPLIT_DATA_CONFIG_WF.out.sub_config
+    // SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
+    // ch_yaml_sub_config = SPLIT_DATA_CONFIG_WF.out.sub_config
 
     // ==============================================================================
     // transform csv file
     // ==============================================================================
 
-    TRANSFORM_CSV_WF(
-        ch_split_data,
-        ch_yaml_sub_config
-    )
-    ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
+    // TRANSFORM_CSV_WF(
+    //     ch_split_data,
+    //     ch_yaml_sub_config
+    // )
+    // ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
 
     // // ==============================================================================
     // // Check model
     // // ==============================================================================
 
-    CHECK_MODEL_WF (
-        ch_transformed_data.first(),
-        ch_yaml_sub_config.first(),
-        ch_model,
-        ch_model_config,
-        ch_initial_weights
-    )
+    // CHECK_MODEL_WF (
+    //     ch_transformed_data.first(),
+    //     ch_yaml_sub_config.first(),
+    //     ch_model,
+    //     ch_model_config,
+    //     ch_initial_weights
+    // )
 
     // // ==============================================================================
     // // Tune model

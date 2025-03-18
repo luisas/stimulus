@@ -12,18 +12,17 @@ include { STIMULUS_SPLIT_SPLIT } from '../../../modules/local/stimulus_split_spl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow SPLIT_DATA_CONFIG_WF {
+workflow SPLIT_DATA_CONFIG_SPLIT_WF {
     take:
     ch_data_config
 
     main:
     STIMULUS_SPLIT_SPLIT( ch_data_config )
-    // flat the list of yaml files
-    // and rename meta id with sub config id
+    // transpose
+    // and add sub config id called split_id
     ch_yaml_sub_config = STIMULUS_SPLIT_SPLIT.out.sub_config
-        .map{ meta, list_of_yaml -> list_of_yaml }
-        .flatten()
-        .map { yaml -> [[id: yaml.baseName], yaml] }
+        .transpose()
+        .map { meta, yaml -> [ meta + [split_id: yaml.baseName], yaml] }
 
     emit:
     sub_config = ch_yaml_sub_config
