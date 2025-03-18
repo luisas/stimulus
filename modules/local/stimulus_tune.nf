@@ -1,7 +1,7 @@
 process STIMULUS_TUNE {
     tag "${meta.id}"
     label 'process_high'
-    container "docker.io/mathysgrapotte/stimulus-py:0.2.6"
+    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
 
     input:
     tuple val(meta), path(transformed_data), path(data_sub_config)

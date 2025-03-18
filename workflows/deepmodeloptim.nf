@@ -10,7 +10,8 @@ include { softwareVersionsToYAML              } from '../subworkflows/nf-core/ut
 include { methodsDescriptionText              } from '../subworkflows/local/utils_nfcore_deepmodeloptim_pipeline'
 include { CHECK_MODEL_WF                      } from '../subworkflows/local/check_model'
 include { PREPROCESS_IBIS_BEDFILE_TO_STIMULUS } from '../subworkflows/local/preprocess_ibis_bedfile_to_stimulus'
-include { SPLIT_DATA_CONFIG_WF                } from '../subworkflows/local/split_data_config'
+include { SPLIT_DATA_CONFIG_SPLIT_WF          } from '../subworkflows/local/split_data_config_split'
+include { SPLIT_DATA_CONFIG_TRANSFORM_WF      } from '../subworkflows/local/split_data_config_transform'
 include { SPLIT_CSV_WF                        } from '../subworkflows/local/split_csv'
 include { TRANSFORM_CSV_WF                    } from '../subworkflows/local/transform_csv'
 include { TUNE_WF                             } from '../subworkflows/local/tune'
@@ -66,57 +67,50 @@ workflow DEEPMODELOPTIM {
     }
 
     // ==============================================================================
-    // split meta yaml config file into individual yaml files
+    // split meta yaml split config file into individual yaml files
     // ==============================================================================
 
-    SPLIT_DATA_CONFIG_WF( ch_data_config )
+    SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
     ch_yaml_sub_config = SPLIT_DATA_CONFIG_WF.out.sub_config
+
 
     // ==============================================================================
     // split csv data file
     // ==============================================================================
 
-    // NOTE for the moment, the previous step of yaml split is splitting the yaml file
-    // into individual sub yaml files with all the fields.
-    // The best would be to have a first step that splits into individual splitting-related
-    // configs into individual splitting yaml files, and then a second step that splits the
-    // transformation-related configs into individual transformation yaml files.
-    // Then this pipeline will run m split configs x n transform configs times.
-    //
-    // Given this is not possible now, this implementation will only allow the user to
-    // provide a yaml file that only contains one splitting way.
-    // Here we take the first sub yaml for data splitting, since all sub configs contain
-    // the same information about data splitting.
-    //
-    // TODO remove this when the above is implemented
-
     SPLIT_CSV_WF(
         ch_data,
-        ch_yaml_sub_config.first()
+        ch_yaml_sub_config
     )
     ch_split_data = SPLIT_CSV_WF.out.split_data
+
+    // ==============================================================================
+    // split meta yaml transform config file into individual yaml files
+    // ==============================================================================
+    SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
+    ch_yaml_sub_config = SPLIT_DATA_CONFIG_WF.out.sub_config
 
     // ==============================================================================
     // transform csv file
     // ==============================================================================
 
-    // TRANSFORM_CSV_WF(
-    //     ch_split_data,
-    //     ch_yaml_sub_config
-    // )
-    // ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
+    TRANSFORM_CSV_WF(
+        ch_split_data,
+        ch_yaml_sub_config
+    )
+    ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
 
     // // ==============================================================================
     // // Check model
     // // ==============================================================================
 
-    // CHECK_MODEL_WF (
-    //     ch_transformed_data.first(),
-    //     ch_yaml_sub_config.first(),
-    //     ch_model,
-    //     ch_model_config,
-    //     ch_initial_weights
-    // )
+    CHECK_MODEL_WF (
+        ch_transformed_data.first(),
+        ch_yaml_sub_config.first(),
+        ch_model,
+        ch_model_config,
+        ch_initial_weights
+    )
 
     // // ==============================================================================
     // // Tune model

@@ -1,10 +1,10 @@
 
-process SPLIT_DATA_CONFIG {
+process STIMULUS_SPLIT_TRANSFORM {
 
     tag "$meta.id"
     label 'process_low'
     // TODO: push image to nf-core quay.io
-    container "docker.io/mathysgrapotte/stimulus-py:0.2.6"
+    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
 
     input:
     tuple val(meta), path(data_config)
@@ -14,7 +14,7 @@ process SPLIT_DATA_CONFIG {
 
     script:
     """
-    stimulus-split-yaml -j ${data_config}
+    stimulus split-split -y ${data_config}
     """
 
     stub:

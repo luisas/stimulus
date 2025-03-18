@@ -4,7 +4,7 @@ process STIMULUS_SPLIT_DATA {
     tag "${meta.id}-${meta2.id}"
     label 'process_low'
     // TODO: push image to nf-core quay.io
-    container "docker.io/mathysgrapotte/stimulus-py:0.2.6"
+    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
 
     input:
     tuple val(meta), path(data)
@@ -16,7 +16,7 @@ process STIMULUS_SPLIT_DATA {
     script:
     prefix = task.ext.prefix ?: "${meta.id}-split-${meta2.id}"
     """
-    stimulus-split-csv \
+    stimulus split-csv \
         -c ${data} \
         -y ${sub_config} \
         -o ${prefix}.csv
