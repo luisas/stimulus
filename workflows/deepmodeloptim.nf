@@ -70,31 +70,23 @@ workflow DEEPMODELOPTIM {
     // split meta yaml split config file into individual yaml files
     // ==============================================================================
 
-    ch_data_config.view()
-
     SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
     ch_yaml_sub_config = SPLIT_DATA_CONFIG_SPLIT_WF.out.sub_config
-
-    ch_yaml_sub_config.view()
-
 
     // ==============================================================================
     // split csv data file
     // ==============================================================================
-
-    // SPLIT_CSV_WF(
-    //     ch_data,
-    //     ch_yaml_sub_config
-    // )
-    // ch_split_data = SPLIT_CSV_WF.out.split_data
-
-    // ch_split_data.view()
+    SPLIT_CSV_WF(
+        ch_data.collect(),
+        ch_yaml_sub_config
+    )
+    ch_split_data = SPLIT_CSV_WF.out.split_data
 
     // ==============================================================================
     // split meta yaml transform config file into individual yaml files
     // ==============================================================================
-    // SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
-    // ch_yaml_sub_config = SPLIT_DATA_CONFIG_WF.out.sub_config
+    SPLIT_DATA_CONFIG_TRANSFORM_WF( ch_split_data )
+    //ch_yaml_sub_config = SPLIT_DATA_CONFIG_TRANSFORM_WF.out.sub_config
 
     // ==============================================================================
     // transform csv file
