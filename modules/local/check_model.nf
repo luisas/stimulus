@@ -27,6 +27,11 @@ process CHECK_MODEL {
         -c ${model_config} \
         -r "\${PWD}" \
         $args
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(python -v | cut -d ' ' -f 2)
+    END_VERSIONS
     """
 
     stub:

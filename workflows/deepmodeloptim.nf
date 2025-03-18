@@ -71,58 +71,58 @@ workflow DEEPMODELOPTIM {
     // ==============================================================================
 
     SPLIT_DATA_CONFIG_SPLIT_WF( ch_data_config )
-    ch_yaml_sub_config = SPLIT_DATA_CONFIG_SPLIT_WF.out.sub_config
+    ch_yaml_sub_config_split = SPLIT_DATA_CONFIG_SPLIT_WF.out.sub_config
 
     // ==============================================================================
     // split csv data file
     // ==============================================================================
     SPLIT_CSV_WF(
         ch_data.collect(),
-        ch_yaml_sub_config
+        ch_yaml_sub_config_split
     )
     ch_split_data = SPLIT_CSV_WF.out.split_data
 
     // ==============================================================================
     // split meta yaml transform config file into individual yaml files
     // ==============================================================================
-    SPLIT_DATA_CONFIG_TRANSFORM_WF( ch_split_data )
-    //ch_yaml_sub_config = SPLIT_DATA_CONFIG_TRANSFORM_WF.out.sub_config
+    SPLIT_DATA_CONFIG_TRANSFORM_WF( ch_yaml_sub_config_split )
+    ch_yaml_sub_config = SPLIT_DATA_CONFIG_TRANSFORM_WF.out.sub_config
 
     // ==============================================================================
     // transform csv file
     // ==============================================================================
 
-    // TRANSFORM_CSV_WF(
-    //     ch_split_data,
-    //     ch_yaml_sub_config
-    // )
-    // ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
+    TRANSFORM_CSV_WF(
+        ch_split_data,
+        ch_yaml_sub_config
+    )
+    ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
 
-    // // ==============================================================================
-    // // Check model
-    // // ==============================================================================
+    // ==============================================================================
+    // Check model
+    // ==============================================================================
 
-    // CHECK_MODEL_WF (
-    //     ch_transformed_data.first(),
-    //     ch_yaml_sub_config.first(),
-    //     ch_model,
-    //     ch_model_config,
-    //     ch_initial_weights
-    // )
+    CHECK_MODEL_WF (
+        ch_transformed_data.first(),
+        ch_yaml_sub_config.first(),
+        ch_model,
+        ch_model_config,
+        ch_initial_weights
+    )
 
     // // ==============================================================================
     // // Tune model
     // // ==============================================================================
 
-    // TUNE_WF(
-    //     ch_transformed_data,
-    //     ch_yaml_sub_config,
-    //     ch_model,
-    //     ch_model_config,
-    //     ch_initial_weights
-    // )
+    TUNE_WF(
+        ch_transformed_data,
+        ch_yaml_sub_config,
+        ch_model,
+        ch_model_config,
+        ch_initial_weights
+    )
 
-    /*
+    
     // Software versions collation remains as comments
     softwareVersionsToYAML(ch_versions)
         .collectFile(
@@ -135,7 +135,7 @@ workflow DEEPMODELOPTIM {
 
     emit:
     versions = ch_versions  // channel: [ path(versions.yml) ]
-    */
+    
 
 }
 

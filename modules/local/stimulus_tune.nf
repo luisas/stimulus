@@ -10,8 +10,6 @@ process STIMULUS_TUNE {
     output:
     tuple val(meta), path("${prefix}-best-model.safetensors"), emit: model
     tuple val(meta), path("${prefix}-best-optimizer.opt")    , emit: optimizer
-    tuple val(meta), path("${prefix}-best-metrics.json")     , emit: metrics
-    tuple val(meta), path("${prefix}-best-tune-config.json") , emit: tune_config
     tuple val(meta), path("TuneModel_*")                     , emit: tune_experiments, optional: true
 
     // TODO: this is a temporary fix with tuning.py
@@ -21,23 +19,13 @@ process STIMULUS_TUNE {
     def args = task.ext.args ?: ""
     def use_initial_weights = initial_weights != [] ? "-w ${initial_weights}" : ""
     """
-    if ! ray status 2>/dev/null; then
-        ray start --head --temp-dir /tmp/ray
-        sleep 5
-    fi
-
-    tuning.py \
+    stimulus tune \
         -d ${transformed_data} \
         -m ${model} \
         -e ${data_sub_config} \
         -c ${model_config} \
         -o ${prefix}-best-model.safetensors \
         -bo ${prefix}-best-optimizer.opt \
-        -bm ${prefix}-best-metrics.json \
-        -bc ${prefix}-best-tune-config.json \
-        ${use_initial_weights} \
-        --tune_run_name ${prefix}-tune-run \
-        --ray_results_dirpath "\${PWD}" \
         ${args}
     """
 
@@ -46,8 +34,6 @@ process STIMULUS_TUNE {
     """
     touch ${prefix}-best-model.safetensors
     touch ${prefix}-best-optimizer.opt
-    touch ${prefix}-best-metrics.json
-    touch ${prefix}-best-tune-config.json
     touch TuneModel_stub.txt
     """
 }
