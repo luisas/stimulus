@@ -4,7 +4,7 @@ process CHECK_MODEL {
     tag "check model"
     label 'process_medium'
     // TODO: push image to nf-core quay.io
-    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
+    container "docker.io/mathysgrapotte/stimulus-py:0.3.0"
     containerOptions '--shm-size=2gb'
 
     input:
@@ -30,7 +30,7 @@ process CHECK_MODEL {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        stimulus: \$(python -v | cut -d ' ' -f 2)
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
     END_VERSIONS
     """
 
