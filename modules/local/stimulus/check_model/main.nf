@@ -1,10 +1,9 @@
-
 process CHECK_MODEL {
 
     tag "check model"
     label 'process_medium'
     // TODO: push image to nf-core quay.io
-    container "docker.io/mathysgrapotte/stimulus-py:0.2.6"
+    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
     containerOptions '--shm-size=2gb'
 
     input:
@@ -20,26 +19,27 @@ process CHECK_MODEL {
     script:
     def args = task.ext.args ?: ''
     """
-    if ! ray status 2>/dev/null; then
-        ray start --head --temp-dir /tmp/ray
-        sleep 5
-    fi
-
-    sleep 5
-
-    export RAY_ADDRESS=localhost:6379
-
-    stimulus-check-model \
+    stimulus check-model \
         -e ${data_config} \
         -d ${data} \
         -m ${model} \
         -c ${model_config} \
-        --ray_results_dirpath "\${PWD}" \
+        -r "\${PWD}" \
         $args
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 
     stub:
     """
     echo passing check-model stub
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        stimulus: \$(stimulus -v | cut -d ' ' -f 3)
+    END_VERSIONS
     """
 }

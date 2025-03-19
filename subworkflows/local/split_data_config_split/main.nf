@@ -4,30 +4,29 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { STIMULUS_SHUFFLE_CSV } from '../../../modules/local/stimulus_shuffle_csv.nf'
+include { STIMULUS_SPLIT_SPLIT } from '../../../modules/local/stimulus/split_split'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    RUN MAIN SUBWORKFLOW
+    RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow SHUFFLE_CSV {
-
+workflow SPLIT_DATA_CONFIG_SPLIT_WF {
     take:
-    csv_json_pairs
-
+    ch_data_config
 
     main:
-
-    STIMULUS_SHUFFLE_CSV(csv_json_pairs)
-
+    STIMULUS_SPLIT_SPLIT( ch_data_config )
+    // transpose
+    // and add sub config id called split_id
+    ch_yaml_sub_config = STIMULUS_SPLIT_SPLIT.out.sub_config
+        .transpose()
+        .map { meta, yaml -> [ meta + [split_id: yaml.baseName], yaml] }
 
     emit:
-    shuffle_data  = STIMULUS_SHUFFLE_CSV.out.csv_shuffled
-
+    sub_config = ch_yaml_sub_config
 }
-
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

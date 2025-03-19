@@ -31,11 +31,13 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_deep
 workflow NFCORE_DEEPMODELOPTIM {
 
     take:
-        data_config
         data
+        data_config
         model
         model_config
         initial_weights
+        preprocessing_config
+        genome
 
     main:
 
@@ -43,11 +45,13 @@ workflow NFCORE_DEEPMODELOPTIM {
     // WORKFLOW: Run pipeline
     //
     DEEPMODELOPTIM (
-        data_config,
         data,
+        data_config,
         model,
         model_config,
-        initial_weights
+        initial_weights,
+        preprocessing_config,
+        genome
     )
 }
 
@@ -68,30 +72,27 @@ workflow {
         params.validate_params,
         params.monochrome_logs,
         args,
-        params.outdir //,
-        // params.input
+        params.outdir,
+        // and the input files
+        params.data,
+        params.data_config,
+        params.model,
+        params.model_config,
+        params.initial_weights,
+        params.preprocessing_config
     )
 
     //
     // WORKFLOW: Run main workflow
     //
-    ch_data_config     = Channel.fromPath(params.data_config, checkIfExists: true).map { it -> [[id:it.baseName], it]}
-    ch_data            = Channel.fromPath(params.data, checkIfExists: true).map { it -> [[id:it.baseName], it]}
-    ch_model           = Channel.fromPath(params.model, checkIfExists: true).map { it -> [[id:it.baseName], it]}
-    ch_model_config    = Channel.fromPath(params.model_config, checkIfExists: true).map { it -> [[id:it.baseName], it]}
-    if (params.initial_weights != null) {
-        ch_initial_weights = Channel.fromPath(params.initial_weights, checkIfExists: true)
-            .map { it -> [[id:it.baseName], it]}
-    } else {
-        ch_initial_weights = Channel.of([[],[]])
-    }
-
     NFCORE_DEEPMODELOPTIM (
-        ch_data_config,
-        ch_data,
-        ch_model,
-        ch_model_config,
-        ch_initial_weights
+        PIPELINE_INITIALISATION.out.data,
+        PIPELINE_INITIALISATION.out.data_config,
+        PIPELINE_INITIALISATION.out.model,
+        PIPELINE_INITIALISATION.out.model_config,
+        PIPELINE_INITIALISATION.out.initial_weights,
+        PIPELINE_INITIALISATION.out.preprocessing_config,
+        PIPELINE_INITIALISATION.out.genome
     )
 
     //

@@ -52,7 +52,6 @@
                 },
                 "save_data": {
                     "type": "boolean",
-                    "default": false,
                     "help_text": "flag to save transformed csv data."
                 },
                 "email": {
@@ -283,12 +282,27 @@
         {
             "$ref": "#/$defs/skip_options"
         },
-
         {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
             "$ref": "#/$defs/generic_options"
         }
-    ]
+    ],
+    "properties": {
+        "preprocessing_config": {
+            "type": "string"
+        },
+        "genome": {
+            "type": "string"
+        },
+        "igenomes_base": {
+            "type": "string",
+            "default": "s3://ngi-igenomes/igenomes"
+        },
+        "bed_peak_size": {
+            "type": "integer",
+            "default": 300
+        }
+    }
 }

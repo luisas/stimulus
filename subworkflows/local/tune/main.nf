@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { STIMULUS_TUNE } from '../../../modules/local/stimulus_tune.nf'
+include { STIMULUS_TUNE } from '../../../modules/local/stimulus/tune'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,8 +42,6 @@ workflow TUNE_WF {
     emit:
     model = STIMULUS_TUNE.out.model
     optimizer = STIMULUS_TUNE.out.optimizer
-    metrics = STIMULUS_TUNE.out.metrics
-    tune_config = STIMULUS_TUNE.out.tune_config
     tune_experiments = STIMULUS_TUNE.out.tune_experiments
 }
 
