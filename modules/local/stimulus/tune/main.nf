@@ -36,7 +36,7 @@ process STIMULUS_TUNE {
     """
 
     stub:
-    prefix = task.ext.prefix ?: meta.id
+    def prefix = task.ext.prefix ?: meta.id
     """
     touch ${prefix}-best-model.safetensors
     touch ${prefix}-best-optimizer.opt
