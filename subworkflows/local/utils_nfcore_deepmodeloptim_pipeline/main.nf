@@ -112,6 +112,10 @@ workflow PIPELINE_INITIALISATION {
                                     (min..max).step(step).toList()
                                 }
                                 .flatten()
+    //
+    // Create the channels for the number of replicates 
+    //
+    ch_tune_replicates = Channel.from(1..params.tune_replicates)
 
 
     emit:
@@ -123,6 +127,7 @@ workflow PIPELINE_INITIALISATION {
     preprocessing_config = ch_preprocessing_config
     genome               = ch_genome
     tune_trials_range    = val_tune_trials_range
+    tune_replicates      = ch_tune_replicates
     versions             = ch_versions
 }
 

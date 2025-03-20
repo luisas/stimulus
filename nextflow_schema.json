@@ -125,6 +125,12 @@
                     "description": "Range of trials for the tuning. Defined as min,max,step.",
                     "default": null,
                     "help_text": "the range of trials for the tuning. Defined as min,max,step. e.g. 5,10,5. If not provided the value will be extracted from the provided stimulus config."
+                }, 
+                "tune_replicates": {
+                    "type": "integer",
+                    "description": "Number of replicates for the tuning.",
+                    "default": 1,
+                    "help_text": "the number of replicates for the tuning, that is how many times the tuning with the same model is run on the same data."
                 }
             }
         },

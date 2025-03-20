@@ -21,6 +21,7 @@ workflow TUNE_WF {
     ch_model_config
     ch_initial_weights
     tune_trials_range
+    tune_replicates
 
     main:
 
@@ -43,12 +44,15 @@ workflow TUNE_WF {
         .combine(ch_model)
         .combine(ch_model_config)
         .combine(ch_initial_weights)
-        .multiMap { meta, data, data_config, meta_model, model, meta_model_config, model_config, meta_weights, initial_weights ->
+        .combine(tune_replicates)
+        .multiMap { meta, data, data_config, meta_model, model, meta_model_config, model_config, meta_weights, initial_weights, n_replicate ->
             data_and_config:
                 [meta, data, data_config]
             model_and_config:
-                [meta_model, model, model_config, initial_weights]
+                [meta_model+[replicate: n_replicate], model, model_config, initial_weights]
         }
+
+
 
     STIMULUS_TUNE(
         ch_tune_input.data_and_config,
