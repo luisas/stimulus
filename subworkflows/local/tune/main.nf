@@ -26,6 +26,12 @@ workflow TUNE_WF {
     // Split the tune_trials_range into individual trials
     ch_versions = Channel.empty()
 
+    tune_trials_range.view()
+
+    ch_model_config.view()
+
+
+
     ch_tune_input = ch_transformed_data
         .join(ch_yaml_sub_config)
         .combine(ch_model)

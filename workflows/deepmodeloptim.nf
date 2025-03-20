@@ -37,6 +37,7 @@ workflow DEEPMODELOPTIM {
     ch_initial_weights
     ch_preprocessing_config
     ch_genome
+    tune_trials_range
 
     main:
 
@@ -119,7 +120,8 @@ workflow DEEPMODELOPTIM {
         ch_yaml_sub_config,
         ch_model,
         ch_model_config,
-        ch_initial_weights
+        ch_initial_weights,
+        tune_trials_range
     )
 
     // Software versions collation remains as comments

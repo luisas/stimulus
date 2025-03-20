@@ -104,8 +104,14 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channels with values for tuning range 
     //
-
+    
+    validate_range(params.tune_trials_range)
     val_tune_trials_range = Channel.from(params.tune_trials_range)
+                                .map { rangeStr -> 
+                                    def (min, max, step) = rangeStr.tokenize(',')*.toInteger()
+                                    (min..max).step(step).toList()
+                                }
+                                .flatten()
 
 
     emit:
@@ -116,7 +122,7 @@ workflow PIPELINE_INITIALISATION {
     initial_weights      = ch_initial_weights
     preprocessing_config = ch_preprocessing_config
     genome               = ch_genome
-    tune_trials_range           = val_tune_trials_range
+    tune_trials_range    = val_tune_trials_range
     versions             = ch_versions
 }
 
@@ -186,6 +192,20 @@ def validateInputSamplesheet(input) {
 
     return [ metas[0], fastqs ]
 }
+
+//
+// Validate range
+//
+def validate_range(range) {
+    def (min, max, step) = range.tokenize(',')*.toInteger()
+    if (min > max) {
+        error("Invalid range: min value is greater than max value: ${range}")
+    }
+    if (step <= 0) {
+        error("Invalid range: step value must be greater than 0: ${range}")
+    }
+}
+
 //
 // Generate methods description for MultiQC
 //

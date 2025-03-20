@@ -38,6 +38,7 @@ workflow NFCORE_DEEPMODELOPTIM {
         initial_weights
         preprocessing_config
         genome
+        tune_trials_range
 
     main:
 
@@ -51,7 +52,8 @@ workflow NFCORE_DEEPMODELOPTIM {
         model_config,
         initial_weights,
         preprocessing_config,
-        genome
+        genome,
+        tune_trials_range
     )
 }
 
@@ -92,7 +94,8 @@ workflow {
         PIPELINE_INITIALISATION.out.model_config,
         PIPELINE_INITIALISATION.out.initial_weights,
         PIPELINE_INITIALISATION.out.preprocessing_config,
-        PIPELINE_INITIALISATION.out.genome
+        PIPELINE_INITIALISATION.out.genome,
+        PIPELINE_INITIALISATION.out.tune_trials_range
     )
 
     //
