@@ -52,6 +52,7 @@
                 },
                 "save_data": {
                     "type": "boolean",
+                    "description": "flag to save transformed csv data.If set to true, the transformed data will be saved in the output directory.",
                     "help_text": "flag to save transformed csv data."
                 },
                 "email": {
@@ -76,6 +77,41 @@
                     "help_text": "The initial weights of the model. These files can be used to start the training instead of random initialization. One can provide several files, each of them will be used for a different run.",
                     "description": "File to be used to initialize the model in tuning",
                     "format": "path"
+                }
+            }
+        }, 
+        "preprocessing_options":{
+            "title": "Preprocessing options",
+            "type": "object",
+            "description": "Options for preprocessing the data",
+            "default": "",
+            "fa_icon": "fas fa-terminal",
+            "properties": {
+                "preprocessing_config": {
+                    "type": "string",
+                    "description": "Preprocessing config YAML",
+                    "fa_icon": "fas fa-folder-open",
+                    "help_text": "the config file that specifies all the parameters relative to the data manipulation."
+                },
+                "genome": {
+                    "type": "string",
+                    "description": "Name of iGenomes reference.",
+                    "fa_icon": "fas fa-book",
+                    "help_text": "If using a reference genome configured in the pipeline using iGenomes (not recommended), use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                },
+                "igenomes_base": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "The base path to the igenomes reference files",
+                    "fa_icon": "fas fa-ban",
+                    "hidden": true,
+                    "default": "s3://ngi-igenomes/igenomes/"
+                },
+                "bed_peak_size": {
+                    "type": "integer",
+                    "description": "Size of the peak extracted from the BED file",
+                    "default": 300,
+                    "help_text": "the size of the peak extracted from the BED file."
                 }
             }
         },
@@ -271,6 +307,9 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
+            "$ref": "#/$defs/preprocessing_options"
+        },
+        {
             "$ref": "#/$defs/optional_inputs"
         },
         {
@@ -288,21 +327,5 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ],
-    "properties": {
-        "preprocessing_config": {
-            "type": "string"
-        },
-        "genome": {
-            "type": "string"
-        },
-        "igenomes_base": {
-            "type": "string",
-            "default": "s3://ngi-igenomes/igenomes"
-        },
-        "bed_peak_size": {
-            "type": "integer",
-            "default": 300
-        }
-    }
+    ]
 }
