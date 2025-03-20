@@ -47,7 +47,7 @@ workflow TUNE_WF {
         .combine(tune_replicates)
         .multiMap { meta, data, data_config, meta_model, model, meta_model_config, model_config, meta_weights, initial_weights, n_replicate ->
             data_and_config:
-                [meta, data, data_config]
+                [meta+[replicate: n_replicate], data, data_config]
             model_and_config:
                 [meta_model+[replicate: n_replicate], model, model_config, initial_weights]
         }
