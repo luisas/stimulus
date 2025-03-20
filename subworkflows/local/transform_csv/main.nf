@@ -21,7 +21,7 @@ workflow TRANSFORM_CSV_WF {
     main:
     // TODO add strategy for handling the launch of stimulus noiser as well as NF-core and other modules
     // TODO if the option is parellalization (for the above) then add csv column splitting  noising  merging
-
+    ch_versions = Channel.empty()
     // modify the meta for the combining
     ch_sub_config.map{
             meta, yaml -> [ [id: meta.id, split_id: meta.split_id], meta, yaml]
@@ -47,9 +47,11 @@ workflow TRANSFORM_CSV_WF {
         ch_input.config
     )
     ch_transformed_data = STIMULUS_TRANSFORM_CSV.out.transformed_data
+    ch_versions = ch_versions.mix(STIMULUS_TRANSFORM_CSV.out.versions)
 
     emit:
     transformed_data = ch_transformed_data
+    versions = ch_versions // channel: [ versions.yml ]
 }
 
 

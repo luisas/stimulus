@@ -19,8 +19,12 @@ workflow TUNE_WF {
     ch_model
     ch_model_config
     ch_initial_weights
+    tune_trials_range
 
     main:
+
+    // Split the tune_trials_range into individual trials
+    ch_versions = Channel.empty()
 
     ch_tune_input = ch_transformed_data
         .join(ch_yaml_sub_config)
@@ -38,11 +42,13 @@ workflow TUNE_WF {
         ch_tune_input.data_and_config,
         ch_tune_input.model_and_config
     )
+    ch_versions = ch_versions.mix(STIMULUS_TUNE.out.versions)
 
     emit:
     model = STIMULUS_TUNE.out.model
     optimizer = STIMULUS_TUNE.out.optimizer
     tune_experiments = STIMULUS_TUNE.out.tune_experiments
+    versions = ch_versions // channel: [ versions.yml ]
 }
 
 /*

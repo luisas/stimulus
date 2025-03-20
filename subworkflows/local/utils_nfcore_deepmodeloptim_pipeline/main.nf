@@ -100,6 +100,14 @@ workflow PIPELINE_INITIALISATION {
         Channel.fromPath(params.genomes[params.genome]['fasta'], checkIfExists: true)
             .map { it -> [[id:params.genome], it]}
 
+    
+    //
+    // Create channels with values for tuning range 
+    //
+
+    val_tune_trials_range = Channel.from(params.tune_trials_range)
+
+
     emit:
     data                 = ch_data
     data_config          = ch_data_config
@@ -108,6 +116,7 @@ workflow PIPELINE_INITIALISATION {
     initial_weights      = ch_initial_weights
     preprocessing_config = ch_preprocessing_config
     genome               = ch_genome
+    tune_trials_range           = val_tune_trials_range
     versions             = ch_versions
 }
 
