@@ -4,7 +4,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { STIMULUS_TUNE } from '../../../modules/local/stimulus/tune'
+include { STIMULUS_TUNE              } from '../../../modules/local/stimulus/tune'
+include { CUSTOM_MODIFY_MODEL_CONFIG } from '../../../modules/local/custom/modify_model_config'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,10 +27,15 @@ workflow TUNE_WF {
     // Split the tune_trials_range into individual trials
     ch_versions = Channel.empty()
 
-    tune_trials_range.view()
 
-    ch_model_config.view()
-
+    // Modify the model config file to include the number of trials
+    // This allows us to run multiple trials numbers with the same model
+    CUSTOM_MODIFY_MODEL_CONFIG(
+        ch_model_config.collect(),
+        tune_trials_range
+    )
+    ch_versions = ch_versions.mix(CUSTOM_MODIFY_MODEL_CONFIG.out.versions)
+    ch_model_config = CUSTOM_MODIFY_MODEL_CONFIG.out.config
 
 
     ch_tune_input = ch_transformed_data

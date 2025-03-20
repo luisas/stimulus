@@ -1,6 +1,6 @@
 process CHECK_MODEL {
 
-    tag "check model"
+    tag "${meta.id}"
     label 'process_medium'
     // TODO: push image to nf-core quay.io
     container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
