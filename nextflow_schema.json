@@ -115,6 +115,19 @@
                 }
             }
         },
+        "tuning_options":{
+            "title": "Tuning options",
+            "type": "object",
+            "description": "Options for tuning the model",
+            "properties": {
+                "tune_trials_range": {
+                    "type": "string",
+                    "description": "Range of trials for the tuning. Defined as min,max,step.",
+                    "default": null,
+                    "help_text": "the range of trials for the tuning. Defined as min,max,step. e.g. 5,10,5. If not provided the value will be extracted from the provided stimulus config."
+                }
+            }
+        },
         "resources_options": {
             "title": "Resources options",
             "type": "object",
@@ -311,6 +324,9 @@
         },
         {
             "$ref": "#/$defs/optional_inputs"
+        },
+        {
+            "$ref": "#/$defs/tuning_options"
         },
         {
             "$ref": "#/$defs/resources_options"
