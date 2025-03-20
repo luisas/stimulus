@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/deepmodeloptim/master/nextflow_schema.json",
     "title": "nf-core/deepmodeloptim pipeline parameters",
-    "description": "nf-core/deepmodeloptim is an end-to-end nextflow based pipeline for statistically testing training procedures of machine learning models",
+    "description": "nf-core/deepmodeloptim is an end-to-end pipeline designed to facilitate the testing and development of deep learning models for genomics.",
     "required": ["data", "data_config", "model", "model_config", "outdir"],
     "type": "object",
     "$defs": {
