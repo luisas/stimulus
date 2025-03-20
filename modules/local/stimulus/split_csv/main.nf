@@ -11,6 +11,7 @@ process STIMULUS_SPLIT_DATA {
 
     output:
     tuple val(meta2), path("${prefix}.csv"), emit: csv_with_split
+    path "versions.yml"          , emit: versions
 
     script:
     prefix = task.ext.prefix ?: "${meta.id}-split-${meta2.id}"

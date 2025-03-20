@@ -11,6 +11,7 @@ process STIMULUS_TUNE {
     tuple val(meta), path("${prefix}-best-model.safetensors"), emit: model
     tuple val(meta), path("${prefix}-best-optimizer.opt")    , emit: optimizer
     tuple val(meta), path("TuneModel_*")                     , emit: tune_experiments, optional: true
+    path "versions.yml"          , emit: versions
 
     // TODO: this is a temporary fix with tuning.py
     // it needs to be updated in stimulus-py package

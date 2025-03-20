@@ -15,6 +15,7 @@ process CHECK_MODEL {
 
     output:
     stdout emit: standardout
+    path "versions.yml"          , emit: versions
 
     script:
     def args = task.ext.args ?: ''

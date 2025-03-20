@@ -11,6 +11,7 @@ process STIMULUS_SPLIT_SPLIT {
 
     output:
     tuple val(meta), path ("*.yaml"), emit: sub_config
+    path "versions.yml"          , emit: versions
 
     script:
     """
