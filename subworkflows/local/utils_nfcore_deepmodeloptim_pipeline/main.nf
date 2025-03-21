@@ -100,20 +100,20 @@ workflow PIPELINE_INITIALISATION {
         Channel.fromPath(params.genomes[params.genome]['fasta'], checkIfExists: true)
             .map { it -> [[id:params.genome], it]}
 
-    
+
     //
-    // Create channels with values for tuning range 
+    // Create channels with values for tuning range
     //
-    
+
     validate_range(params.tune_trials_range)
     val_tune_trials_range = Channel.from(params.tune_trials_range)
-                                .map { rangeStr -> 
+                                .map { rangeStr ->
                                     def (min, max, step) = rangeStr.tokenize(',')*.toInteger()
                                     (min..max).step(step).toList()
                                 }
                                 .flatten()
     //
-    // Create the channels for the number of replicates 
+    // Create the channels for the number of replicates
     //
     ch_tune_replicates = Channel.from(1..params.tune_replicates)
 

@@ -16,7 +16,7 @@ process STIMULUS_TUNE {
     // TODO: this is a temporary fix with tuning.py
     // it needs to be updated in stimulus-py package
     script:
-    def prefix = task.ext.prefix ?: meta.id
+    prefix = task.ext.prefix ?: meta.id
     def args = task.ext.args ?: ""
     def use_initial_weights = initial_weights != [] ? "-w ${initial_weights}" : ""
     """
@@ -36,7 +36,7 @@ process STIMULUS_TUNE {
     """
 
     stub:
-    def prefix = task.ext.prefix ?: meta.id
+    prefix = task.ext.prefix ?: meta.id
     """
     touch ${prefix}-best-model.safetensors
     touch ${prefix}-best-optimizer.opt
