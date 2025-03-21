@@ -79,8 +79,8 @@
                     "format": "path"
                 }
             }
-        }, 
-        "preprocessing_options":{
+        },
+        "preprocessing_options": {
             "title": "Preprocessing options",
             "type": "object",
             "description": "Options for preprocessing the data",
@@ -115,7 +115,7 @@
                 }
             }
         },
-        "tuning_options":{
+        "tuning_options": {
             "title": "Tuning options",
             "type": "object",
             "description": "Options for tuning the model",
@@ -125,7 +125,7 @@
                     "description": "Range of trials for the tuning. Defined as min,max,step.",
                     "default": null,
                     "help_text": "the range of trials for the tuning. Defined as min,max,step. e.g. 5,10,5. If not provided the value will be extracted from the provided stimulus config."
-                }, 
+                },
                 "tune_replicates": {
                     "type": "integer",
                     "description": "Number of replicates for the tuning.",
