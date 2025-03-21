@@ -105,8 +105,8 @@ workflow PIPELINE_INITIALISATION {
     // Create channels with values for tuning range
     //
 
-    validate_range(params.tune_trials_range)
-    val_tune_trials_range = Channel.from(params.tune_trials_range)
+    range = validate_range(params.tune_trials_range)
+    val_tune_trials_range = Channel.from(range)
                                 .map { rangeStr ->
                                     def (min, max, step) = rangeStr.tokenize(',')*.toInteger()
                                     (min..max).step(step).toList()
@@ -202,6 +202,10 @@ def validateInputSamplesheet(input) {
 // Validate range
 //
 def validate_range(range) {
+
+    if (range == null) {
+        return "1,1,1"
+    }
     def (min, max, step) = range.tokenize(',')*.toInteger()
     if (min > max) {
         error("Invalid range: min value is greater than max value: ${range}")
@@ -209,6 +213,8 @@ def validate_range(range) {
     if (step <= 0) {
         error("Invalid range: step value must be greater than 0: ${range}")
     }
+
+    return range
 }
 
 //
