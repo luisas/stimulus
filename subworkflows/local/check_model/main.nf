@@ -35,7 +35,7 @@ workflow CHECK_MODEL_WF {
     )
     ch_versions = ch_versions.mix(CHECK_MODEL.out.versions)
 
-    emit: 
+    emit:
     versions = ch_versions // channel: [ versions.yml ]
 }
 
