@@ -3,7 +3,7 @@ process STIMULUS_SPLIT_DATA {
     tag "${meta.id}-${meta2.id}"
     label 'process_low'
     // TODO: push image to nf-core quay.io
-    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
+    container "docker.io/mathysgrapotte/stimulus-py:dev"
 
     input:
     tuple val(meta), path(data)
