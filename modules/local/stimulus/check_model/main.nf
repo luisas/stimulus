@@ -4,7 +4,6 @@ process CHECK_MODEL {
     label 'process_medium'
     // TODO: push image to nf-core quay.io
     container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
-    containerOptions '--shm-size=2gb'
 
     input:
     tuple val(meta), path(data_config)
