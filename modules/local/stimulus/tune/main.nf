@@ -8,12 +8,11 @@ process STIMULUS_TUNE {
     tuple val(meta2), path(model), path(model_config), path(initial_weights)
 
     output:
-    tuple val(meta), path("${prefix}-best-model.safetensors"), emit: model
-    tuple val(meta), path("${prefix}-best-optimizer.opt")    , emit: optimizer
-    tuple val(meta), path("TuneModel_*")                     , emit: tune_experiments, optional: true
+    tuple val(meta), path("${prefix}-best-model.safetensors")         , emit: model
+    tuple val(meta), path("${prefix}-best-optimizer.opt")             , emit: optimizer
+    tuple val(meta), path("optuna_results/artifacts")                 , emit: artifacts
+    tuple val(meta), path("optuna_results/optuna_journal_storage.log"), emit: journal
 
-    // TODO: this is a temporary fix with tuning.py
-    // it needs to be updated in stimulus-py package
     script:
     prefix = task.ext.prefix ?: meta.id
     def args = task.ext.args ?: ""

@@ -42,7 +42,8 @@ workflow TUNE_WF {
     emit:
     model = STIMULUS_TUNE.out.model
     optimizer = STIMULUS_TUNE.out.optimizer
-    tune_experiments = STIMULUS_TUNE.out.tune_experiments
+    tune_experiments = STIMULUS_TUNE.out.artifacts
+    journal = STIMULUS_TUNE.out.journal
 }
 
 /*
