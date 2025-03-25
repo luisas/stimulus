@@ -4,8 +4,9 @@ process STIMULUS_PREDICT {
     container "luisas/stimulus"
 
     input:
-    tuple val(meta) , path(json_model), path(weigths)
-    tuple val(meta2), path(data)
+    tuple val(meta) , path(json_model)
+    tuple val(meta2), path(weigths)
+    tuple val(meta3), path(data)
 
     output:
     tuple val(meta), path("${prefix}-pred"), emit: predictions
