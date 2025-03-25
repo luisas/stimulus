@@ -15,6 +15,7 @@ include { SPLIT_DATA_CONFIG_TRANSFORM_WF      } from '../subworkflows/local/spli
 include { SPLIT_CSV_WF                        } from '../subworkflows/local/split_csv'
 include { TRANSFORM_CSV_WF                    } from '../subworkflows/local/transform_csv'
 include { TUNE_WF                             } from '../subworkflows/local/tune'
+include { EVALUATION_WF                       } from '../subworkflows/local/evaluation'
 
 //
 // MODULES: Consisting of nf-core/modules
@@ -39,6 +40,7 @@ workflow DEEPMODELOPTIM {
     ch_genome
     tune_trials_range
     tune_replicates
+    prediction_data
 
     main:
 
@@ -112,9 +114,9 @@ workflow DEEPMODELOPTIM {
         ch_initial_weights
     )
 
-    // // ==============================================================================
-    // // Tune model
-    // // ==============================================================================
+    // ==============================================================================
+    // Tune model
+    // ==============================================================================
 
     TUNE_WF(
         ch_transformed_data,
@@ -125,6 +127,16 @@ workflow DEEPMODELOPTIM {
         tune_trials_range,
         tune_replicates
     )
+
+    // ==============================================================================
+    // Evaluation 
+    // ==============================================================================
+    EVALUATION_WF(
+        TUNE_WF.out.model,
+        TUNE_WF.out.optimizer,
+        prediction_data
+    )
+
 
     // Software versions collation remains as comments
     softwareVersionsToYAML(ch_versions)

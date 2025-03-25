@@ -117,6 +117,14 @@ workflow PIPELINE_INITIALISATION {
     //
     ch_tune_replicates = Channel.from(1..params.tune_replicates)
 
+    //
+    // Create the channels for the prediction data
+    //  
+    ch_prediction_data = params.prediction_data == null ?
+            Channel.of([[],[]]) :
+            Channel.fromPath(params.prediction_data, checkIfExists: true)
+                .map { it -> [[id:it.baseName], it]}
+
 
     emit:
     data                 = ch_data
@@ -128,6 +136,7 @@ workflow PIPELINE_INITIALISATION {
     genome               = ch_genome
     tune_trials_range    = val_tune_trials_range
     tune_replicates      = ch_tune_replicates
+    prediction_data      = ch_prediction_data
     versions             = ch_versions
 }
 
