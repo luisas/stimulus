@@ -134,6 +134,21 @@
                 }
             }
         },
+        "evaluation_options": {
+            "title": "Evaluation options",
+            "type": "object",
+            "description": "Options for evaluating the model",
+            "properties": {
+                "prediction_data": {
+                    "type": "string",
+                    "description": "Prediction data CSV file",
+                    "fa_icon": "fas fa-folder-open",
+                    "mimetype": "tesxt/csv",
+                    "help_text": "the input file containing all input data for the prediction."
+                }
+            }
+
+        },
         "resources_options": {
             "title": "Resources options",
             "type": "object",
