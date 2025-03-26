@@ -101,20 +101,29 @@ workflow DEEPMODELOPTIM {
     ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
 
     // ==============================================================================
-    // Check model
+    // check model
     // ==============================================================================
 
+    // pre-step to check everything is fine
+    // to do so we only run the first element of the sorted channel, as we don't need
+    // to check on each transformed data
+    // we sort the channel so that we always get the same input, as the default order
+    // of the channel depends on which process finishes first (run in parallel)
+    ch_check_input_data = ch_transformed_data.toSortedList().flatten().buffer(size:2).first()
+    ch_check_input_config = ch_yaml_sub_config.toSortedList().flatten().buffer(size:2).first()
+    
     CHECK_MODEL_WF (
-        ch_transformed_data.first(),
-        ch_yaml_sub_config.first(),
+        ch_check_input_data,
+        ch_check_input_config,
         ch_model,
         ch_model_config,
         ch_initial_weights
     )
 
     // ==============================================================================
-    // Tune model
+    // tune model
     // ==============================================================================
+
     // Create dependancy WF dependency to ensure TUNE_WF runs after CHECK_MODEL_WF finished
     ch_transformed_data = CHECK_MODEL_WF.out.concat(ch_transformed_data)
 
@@ -126,6 +135,10 @@ workflow DEEPMODELOPTIM {
         ch_initial_weights
     )
 
+    // ==============================================================================
+    // report
+    // ==============================================================================
+
     // Software versions collation remains as comments
     softwareVersionsToYAML(ch_versions)
         .collectFile(
@@ -134,7 +147,6 @@ workflow DEEPMODELOPTIM {
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
-
 
     emit:
     versions = ch_versions  // channel: [ path(versions.yml) ]
