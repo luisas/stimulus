@@ -29,11 +29,13 @@ workflow EVALUATION_WF {
 
     STIMULUS_PREDICT(
         model,
-        ch_data
+        ch_data.collect()
     )
-    //ch_versions = ch_versions.mix(STIMULUS_PREDICT.out.versions)
-    //predictions = STIMULUS_PREDICT.out.predictions
-    //predictions.view()
+    ch_versions = ch_versions.mix(STIMULUS_PREDICT.out.versions)
+    predictions = STIMULUS_PREDICT.out.predictions
+    predictions.view()
+
+    //
 
 
     emit: 
