@@ -34,17 +34,17 @@ workflow TUNE_WF {
         )
         .combine(ch_model.map{it[1]})
         .combine(ch_model_config.map{it[1]})
-        .combine(ch_initial_weights.map{it[1]})
-        .multiMap { key, meta, data, data_config, model, model_config, initial_weights ->
-            data_and_config:
+        .combine(ch_initial_weights)
+        .multiMap { key, meta, data, data_config, model, model_config, meta_weights, initial_weights ->
+            data:
                 [meta, data, data_config]
-            model_and_config:
+            model:
                 [meta, model, model_config, initial_weights]
         }
 
     STIMULUS_TUNE(
-        ch_tune_input.data_and_config,
-        ch_tune_input.model_and_config
+        ch_tune_input.data,
+        ch_tune_input.model
     )
 
     emit:
