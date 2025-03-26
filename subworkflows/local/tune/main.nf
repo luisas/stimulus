@@ -23,15 +23,23 @@ workflow TUNE_WF {
     main:
 
     ch_tune_input = ch_transformed_data
-        .join(ch_yaml_sub_config)
-        .combine(ch_model)
-        .combine(ch_model_config)
-        .combine(ch_initial_weights)
-        .multiMap { meta, data, data_config, meta_model, model, meta_model_config, model_config, meta_weights, initial_weights ->
+        .map { meta, data ->
+            [[split_id: meta.split_id, transform_id: meta.transform_id], meta, data]
+        }
+        .combine(
+            ch_yaml_sub_config.map { meta, config ->
+                [[split_id: meta.split_id, transform_id: meta.transform_id], config]
+            }
+            ,by: 0
+        )
+        .combine(ch_model.map{it[1]})
+        .combine(ch_model_config.map{it[1]})
+        .combine(ch_initial_weights.map{it[1]})
+        .multiMap { key, meta, data, data_config, model, model_config, initial_weights ->
             data_and_config:
                 [meta, data, data_config]
             model_and_config:
-                [meta_model, model, model_config, initial_weights]
+                [meta, model, model_config, initial_weights]
         }
 
     STIMULUS_TUNE(

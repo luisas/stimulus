@@ -83,8 +83,6 @@ workflow DEEPMODELOPTIM {
     )
     ch_split_data = SPLIT_CSV_WF.out.split_data
 
-    ch_split_data.view{"ch_split_data is $it"}
-
     // ==============================================================================
     // split meta yaml transform config file into individual yaml files
     // ==============================================================================
@@ -101,8 +99,6 @@ workflow DEEPMODELOPTIM {
         ch_yaml_sub_config
     )
     ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
-
-    ch_transformed_data.view{"ch_transformed_data is $it"}
 
     // ==============================================================================
     // Check model
