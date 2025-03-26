@@ -6,6 +6,8 @@
 
 include { STIMULUS_PREDICT                                                } from '../../../modules/local/stimulus/predict'
 include { STIMULUS_COMPARE_TENSORS as STIMULUS_COMPARE_TENSORS_COSINE     } from '../../../modules/local/stimulus/compare_tensors'
+include { CSVTK_CONCAT  as CONCAT_COSINE                                      } from '../../../modules/nf-core/csvtk/concat/main.nf'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN SUBWORKFLOW
@@ -52,11 +54,23 @@ workflow EVALUATION_WF {
                     [merging_meta, predictions]
             }
 
-    replicate_predictions.view()
-
     //STIMULUS_COMPARE_TENSORS_COSINE(
     //    replicate_predictions
     //)
+
+    //cosine_scores = STIMULUS_COMPARE_TENSORS_COSINE.out.scores
+
+    //cosine_scores
+    //.map {
+    //    meta, csv -> csv
+    //}
+    //.collect()
+    //.map {
+    //    csv ->
+    //        [ [ id:"summary_cosine" ], csv ]
+    //}
+    //.set { ch_cosine_summary }
+    //CONCAT_COSINE (ch_cosine_summary, "csv", "csv")
 
 
     emit: 

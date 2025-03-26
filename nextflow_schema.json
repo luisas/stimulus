@@ -147,7 +147,6 @@
                     "help_text": "the input file containing all input data for the prediction."
                 }
             }
-
         },
         "resources_options": {
             "title": "Resources options",
