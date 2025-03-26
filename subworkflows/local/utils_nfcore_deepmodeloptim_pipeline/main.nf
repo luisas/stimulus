@@ -97,9 +97,11 @@ workflow PIPELINE_INITIALISATION {
     //
     ch_genome = params.genome == null ?
         Channel.of([[],[]]) :
-        (params.genome in params.genomes) ? 
+        (
+            params.genome in params.genomes ? 
             Channel.fromPath(params.genomes[params.genome]['fasta'], checkIfExists: true) :
-            Channel.fromPath(params.genome, checkIfExists: true)    
+            Channel.fromPath(params.genome, checkIfExists: true)
+        )
         .map { it -> [[id:params.genome], it]}
 
     emit:
