@@ -24,21 +24,21 @@ workflow SPLIT_CSV_WF {
     // Split csv data using stimulus
     // ==============================================================================
 
-    // combine each data with each split yaml
-    ch_input_for_splitting = ch_data
+    // combine each data with each split config
+    ch_input = ch_data
         .combine(ch_config_split)
-        .multiMap { meta_data, data, meta_yaml, yaml ->
-            def meta = meta_data + [split_id: meta_yaml.split_id]
+        .multiMap { meta_data, data, meta_config, config ->
+            def meta = meta_data + [split_id: meta_config.split_id]
             data:
             [meta, data]
             config:
-            [meta, yaml]
+            [meta, config]
         }
 
     // run stimulus split
     STIMULUS_SPLIT_DATA(
-        ch_input_for_splitting.data,
-        ch_input_for_splitting.config
+        ch_input.data,
+        ch_input.config
     )
     ch_split_data = STIMULUS_SPLIT_DATA.out.csv_with_split
 

@@ -76,15 +76,19 @@ workflow DEEPMODELOPTIM {
     // ==============================================================================
     // split csv data file
     // ==============================================================================
+
     SPLIT_CSV_WF(
-        ch_data.collect(),
+        ch_data,
         ch_yaml_sub_config_split
     )
     ch_split_data = SPLIT_CSV_WF.out.split_data
 
+    ch_split_data.view{"ch_split_data is $it"}
+
     // ==============================================================================
     // split meta yaml transform config file into individual yaml files
     // ==============================================================================
+
     SPLIT_DATA_CONFIG_TRANSFORM_WF( ch_yaml_sub_config_split )
     ch_yaml_sub_config = SPLIT_DATA_CONFIG_TRANSFORM_WF.out.sub_config
 
@@ -98,6 +102,8 @@ workflow DEEPMODELOPTIM {
     )
     ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
 
+    ch_transformed_data.view{"ch_transformed_data is $it"}
+
     // ==============================================================================
     // Check model
     // ==============================================================================
@@ -110,9 +116,9 @@ workflow DEEPMODELOPTIM {
         ch_initial_weights
     )
 
-    // // ==============================================================================
-    // // Tune model
-    // // ==============================================================================
+    // ==============================================================================
+    // Tune model
+    // ==============================================================================
 
     TUNE_WF(
         ch_transformed_data,
