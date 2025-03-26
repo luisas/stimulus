@@ -111,7 +111,7 @@ workflow DEEPMODELOPTIM {
     // of the channel depends on which process finishes first (run in parallel)
     ch_check_input_data = ch_transformed_data.toSortedList().flatten().buffer(size:2).first()
     ch_check_input_config = ch_yaml_sub_config.toSortedList().flatten().buffer(size:2).first()
-    
+
     CHECK_MODEL_WF (
         ch_check_input_data,
         ch_check_input_config,
