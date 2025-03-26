@@ -12,11 +12,12 @@ process CUSTOM_MODIFY_MODEL_CONFIG {
     val(n_trials)
 
     output:
-    tuple val(meta), path("${prefix}.yaml"), emit: config
+    tuple val(meta_updated), path("${prefix}.yaml"), emit: config
     path "versions.yml"                    , emit: versions
 
     script:
     prefix = task.ext.prefix ?: "${config.baseName}-trials_updated"
+    meta_updated = meta + ["n_trials": "${n_trials}"]
     """
     # substitte the line containing n_trials in the config file with n_trials: \${n_trials}
     awk -v n_trials=${n_trials} '/n_trials: [0-9]+/ {gsub(/n_trials: [0-9]+/, "n_trials: " n_trials)}1' ${config} > ${prefix}.yaml

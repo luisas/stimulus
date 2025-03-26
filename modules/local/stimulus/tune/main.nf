@@ -8,9 +8,9 @@ process STIMULUS_TUNE {
     tuple val(meta2), path(model), path(model_config), path(initial_weights)
 
     output:
-    tuple val(meta), path(model), path("best_config.json"), path("${prefix}-best-model.safetensors") , emit: best_model
-    tuple val(meta), path("${prefix}-best-optimizer.opt")                               , emit: optimizer
-    tuple val(meta), path("TuneModel_*")                                                , emit: tune_experiments, optional: true
+    tuple val(meta_complete), path(model), path("best_config.json"), path("${prefix}-best-model.safetensors") , emit: best_model
+    tuple val(meta_complete), path("${prefix}-best-optimizer.opt")                               , emit: optimizer
+    tuple val(meta_complete), path("TuneModel_*")                                                , emit: tune_experiments, optional: true
     // Now we need to output this one for the predict module - this will be have to be changed!
     tuple val(meta), path(data_sub_config)                                              , emit: data_config
     path "versions.yml"          , emit: versions
@@ -19,6 +19,7 @@ process STIMULUS_TUNE {
     prefix = task.ext.prefix ?: meta.id
     def args = task.ext.args ?: ""
     def use_initial_weights = initial_weights != [] ? "-w ${initial_weights}" : ""
+    meta_complete = meta2 + meta
     """
     stimulus tune \
         -d ${transformed_data} \

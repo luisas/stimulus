@@ -38,7 +38,6 @@ workflow TUNE_WF {
     ch_versions = ch_versions.mix(CUSTOM_MODIFY_MODEL_CONFIG.out.versions)
     ch_model_config = CUSTOM_MODIFY_MODEL_CONFIG.out.config
 
-
     ch_tune_input = ch_transformed_data
         .join(ch_yaml_sub_config)
         .combine(ch_model)
@@ -49,10 +48,8 @@ workflow TUNE_WF {
             data_and_config:
                 [meta+[replicate: n_replicate], data, data_config]
             model_and_config:
-                [meta_model+[replicate: n_replicate], model, model_config, initial_weights]
+                [meta_model+[replicate: n_replicate]+meta_model_config, model, model_config, initial_weights]
         }
-
-
 
     STIMULUS_TUNE(
         ch_tune_input.data_and_config,
