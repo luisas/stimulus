@@ -34,7 +34,7 @@ workflow TUNE_WF {
         )
         .combine(ch_model.map{it[1]})
         .combine(ch_model_config.map{it[1]})
-        .combine(ch_initial_weights)
+        .combine(ch_initial_weights)    // when initial_weights is empty .map{it[1]} will return [], and not properly combined
         .multiMap { key, meta, data, data_config, model, model_config, meta_weights, initial_weights ->
             data:
                 [meta, data, data_config]
