@@ -15,8 +15,7 @@ include { STIMULUS_PREDICT             } from '../../../modules/local/stimulus/p
 
 workflow EVALUATION_WF {
     take:
-    ch_json_model
-    ch_weights
+    model
     ch_data
 
     main:
@@ -29,14 +28,12 @@ workflow EVALUATION_WF {
     //
 
     STIMULUS_PREDICT(
-        ch_json_model,
-        ch_weights,
+        model,
         ch_data
     )
-    ch_versions = ch_versions.mix(STIMULUS_PREDICT.out.versions)
-    predictions = STIMULUS_PREDICT.out.predictions
-    predictions.view()
-
+    //ch_versions = ch_versions.mix(STIMULUS_PREDICT.out.versions)
+    //predictions = STIMULUS_PREDICT.out.predictions
+    //predictions.view()
 
 
     emit: 

@@ -2,7 +2,7 @@ process CUSTOM_MODIFY_MODEL_CONFIG {
 
     tag "${meta.id} - #trial ${n_trials}"
     label 'process_low'
-    // TODO: push image to nf-core quay.io
+
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
     'https://depot.galaxyproject.org/singularity/ubuntu:22.04' :
     'nf-core/ubuntu:22.04' }"

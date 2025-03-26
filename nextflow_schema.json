@@ -347,6 +347,9 @@
             "$ref": "#/$defs/optional_inputs"
         },
         {
+            "$ref": "#/$defs/evaluation_options"
+        },
+        {
             "$ref": "#/$defs/tuning_options"
         },
         {

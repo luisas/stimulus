@@ -131,9 +131,13 @@ workflow DEEPMODELOPTIM {
     // ==============================================================================
     // Evaluation 
     // ==============================================================================
+    
+    // Now the data config will not work if passed in full
+    // We need to pass in the split data config, any of them, for the predict modules 
+    // This will be changed in the future
+    prediction_data = prediction_data.combine(TUNE_WF.out.data_config.first().map{meta,file -> file}) 
     EVALUATION_WF(
-        TUNE_WF.out.model,
-        TUNE_WF.out.optimizer,
+        TUNE_WF.out.best_model,
         prediction_data
     )
 

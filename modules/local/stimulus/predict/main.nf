@@ -1,15 +1,14 @@
 process STIMULUS_PREDICT {
     tag "${meta.id}"
     label 'process_medium'
-    container "luisas/stimulus"
+    container "docker.io/mathysgrapotte/stimulus-py:dev"
 
     input:
-    tuple val(meta) , path(json_model)
-    tuple val(meta2), path(weigths)
-    tuple val(meta3), path(data)
+    tuple val(meta) , path(model), path(model_config), path(weigths)
+    tuple val(meta2), path(data), path(data_config)
 
     output:
-    tuple val(meta), path("${prefix}-pred"), emit: predictions
+    tuple val(meta), path("${prefix}-pred.safetensors"), emit: predictions
     path "versions.yml"          , emit: versions
 
     script:
@@ -18,9 +17,11 @@ process STIMULUS_PREDICT {
     """
     stimulus predict \
         -d ${data} \
+        -e ${data_config} \
         -m ${model} \
+        -c ${model_config} \
         -w ${weigths} \
-        -o ${prefix}-pred \
+        -o ${prefix}-pred.safetensors \
         ${args}
 
     cat <<-END_VERSIONS > versions.yml
@@ -32,7 +33,7 @@ process STIMULUS_PREDICT {
     stub:
     prefix = task.ext.prefix ?: meta.id
     """
-    touch ${prefix}-pred
+    touch ${prefix}-pred.safetensors
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

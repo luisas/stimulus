@@ -1,20 +1,20 @@
 process STIMULUS_TUNE {
     tag "${meta.id}"
     label 'process_high'
-    container "docker.io/mathysgrapotte/stimulus-py:0.3.0.dev"
+    container "docker.io/mathysgrapotte/stimulus-py:dev"
 
     input:
     tuple val(meta), path(transformed_data), path(data_sub_config)
     tuple val(meta2), path(model), path(model_config), path(initial_weights)
 
     output:
-    tuple val(meta), path("${prefix}-best-model.safetensors"), emit: model
-    tuple val(meta), path("${prefix}-best-optimizer.opt")    , emit: optimizer
-    tuple val(meta), path("TuneModel_*")                     , emit: tune_experiments, optional: true
+    tuple val(meta), path(model), path("best_config.json"), path("${prefix}-best-model.safetensors") , emit: best_model
+    tuple val(meta), path("${prefix}-best-optimizer.opt")                               , emit: optimizer
+    tuple val(meta), path("TuneModel_*")                                                , emit: tune_experiments, optional: true
+    // Now we need to output this one for the predict module - this will be have to be changed!
+    tuple val(meta), path(data_sub_config)                                              , emit: data_config
     path "versions.yml"          , emit: versions
 
-    // TODO: this is a temporary fix with tuning.py
-    // it needs to be updated in stimulus-py package
     script:
     prefix = task.ext.prefix ?: meta.id
     def args = task.ext.args ?: ""
@@ -40,6 +40,7 @@ process STIMULUS_TUNE {
     """
     touch ${prefix}-best-model.safetensors
     touch ${prefix}-best-optimizer.opt
+    touch best_config.json
     touch TuneModel_stub.txt
 
     cat <<-END_VERSIONS > versions.yml

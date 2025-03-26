@@ -61,8 +61,9 @@ workflow TUNE_WF {
     ch_versions = ch_versions.mix(STIMULUS_TUNE.out.versions)
 
     emit:
-    model = STIMULUS_TUNE.out.model
-    optimizer = STIMULUS_TUNE.out.optimizer
+    best_model = STIMULUS_TUNE.out.best_model
+    optimizer  = STIMULUS_TUNE.out.optimizer
+    data_config = STIMULUS_TUNE.out.data_config
     tune_experiments = STIMULUS_TUNE.out.tune_experiments
     versions = ch_versions // channel: [ versions.yml ]
 }

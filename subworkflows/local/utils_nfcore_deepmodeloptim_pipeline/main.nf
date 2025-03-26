@@ -121,7 +121,7 @@ workflow PIPELINE_INITIALISATION {
     // Create the channels for the prediction data
     //  
     ch_prediction_data = params.prediction_data == null ?
-            Channel.of([[],[]]) :
+            Channel.empty() :
             Channel.fromPath(params.prediction_data, checkIfExists: true)
                 .map { it -> [[id:it.baseName], it]}
 
