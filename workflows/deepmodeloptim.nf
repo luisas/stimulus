@@ -126,6 +126,7 @@ workflow DEEPMODELOPTIM {
 
     // Create dependancy WF dependency to ensure TUNE_WF runs after CHECK_MODEL_WF finished
     ch_transformed_data = CHECK_MODEL_WF.out.concat(ch_transformed_data)
+        .filter{it}   // remove the empty element from the check model
 
     TUNE_WF(
         ch_transformed_data,
