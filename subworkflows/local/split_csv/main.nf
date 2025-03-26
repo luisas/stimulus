@@ -16,7 +16,7 @@ workflow SPLIT_CSV_WF {
 
     take:
     ch_data
-    ch_yaml_sub_config
+    ch_config_split
 
     main:
 
@@ -26,7 +26,7 @@ workflow SPLIT_CSV_WF {
 
     // combine each data with each split yaml
     ch_input_for_splitting = ch_data
-        .combine(ch_yaml_sub_config)
+        .combine(ch_config_split)
         .multiMap { meta_data, data, meta_yaml, yaml ->
             def meta = meta_data + [split_id: meta_yaml.split_id]
             data:
