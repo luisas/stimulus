@@ -24,8 +24,8 @@ workflow EVALUATION_WF {
 
     ch_versions = Channel.empty()
 
-    // 
-    // Evaluation mode 1: Predict the data using the best model 
+    //
+    // Evaluation mode 1: Predict the data using the best model
     // and then compare the predictions of 2 different models
     //
 
@@ -36,44 +36,49 @@ workflow EVALUATION_WF {
     ch_versions = ch_versions.mix(STIMULUS_PREDICT.out.versions)
     predictions = STIMULUS_PREDICT.out.predictions
 
-    // Now we can estimate the noise across replicates 
+    // Now we can estimate the noise across replicates
     // This means: given a fixed initial model, initial data, and initial weights
     // and the same number of trials, we can estimate the noise across replicates
     // This is done by comparing the predictions of the alternative models between each other
     // and then calculatin a summary metric over them (e.g. mean, median, std, etc.)
 
     replicate_predictions = predictions.map{
-                meta, prediction -> 
+                meta, prediction ->
                     [["id": meta.id,
                     "split_id": meta.split_id,
                     "transform_id": meta.transform_id,
                     "n_trials": meta.n_trials ], meta, prediction]
             }.groupTuple(by:0)
             .map{
-                merging_meta, metas, predictions -> 
+                merging_meta, metas, predictions ->
                     [merging_meta, predictions]
             }
 
-    //STIMULUS_COMPARE_TENSORS_COSINE(
-    //    replicate_predictions
-    //)
+    // check if the predictions are at least 2, meta,predictions
+    replicate_predictions.filter{
+        it[1].size() > 1
+    }.set{ replicate_predictions }
 
-    //cosine_scores = STIMULUS_COMPARE_TENSORS_COSINE.out.scores
+    STIMULUS_COMPARE_TENSORS_COSINE(
+        replicate_predictions
+    )
 
-    //cosine_scores
-    //.map {
-    //    meta, csv -> csv
-    //}
-    //.collect()
-    //.map {
-    //    csv ->
-    //        [ [ id:"summary_cosine" ], csv ]
-    //}
-    //.set { ch_cosine_summary }
-    //CONCAT_COSINE (ch_cosine_summary, "csv", "csv")
+    cosine_scores = STIMULUS_COMPARE_TENSORS_COSINE.out.csv
 
+    cosine_scores
+    .map {
+        meta, csv -> csv
+    }
+    .collect()
+    .map {
+        csv ->
+            [ [ id:"summary_cosine" ], csv ]
+    }
+    .set { ch_cosine_summary }
+    CONCAT_COSINE (ch_cosine_summary, "csv", "csv")
+    
 
-    emit: 
+    emit:
     versions = ch_versions // channel: [ versions.yml ]
 
 }

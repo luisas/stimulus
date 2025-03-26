@@ -106,19 +106,19 @@ workflow DEEPMODELOPTIM {
     // Check model
     // ==============================================================================
 
-    CHECK_MODEL_WF (
-        ch_transformed_data.first(),
-        ch_yaml_sub_config.first(),
-        ch_model,
-        ch_model_config,
-        ch_initial_weights
-    )
+    // CHECK_MODEL_WF (
+    //     ch_transformed_data.first(),
+    //     ch_yaml_sub_config.first(),
+    //     ch_model,
+    //     ch_model_config,
+    //     ch_initial_weights
+    // )
 
     // ==============================================================================
     // Tune model
     // ==============================================================================
     // Create dependancy WF dependency to ensure TUNE_WF runs after CHECK_MODEL_WF finished
-    ch_transformed_data = CHECK_MODEL_WF.out.concat(ch_transformed_data)
+    //ch_transformed_data = CHECK_MODEL_WF.out.concat(ch_transformed_data)
 
     TUNE_WF(
         ch_transformed_data,
@@ -131,13 +131,13 @@ workflow DEEPMODELOPTIM {
     )
 
     // ==============================================================================
-    // Evaluation 
+    // Evaluation
     // ==============================================================================
-    
+
     // Now the data config will not work if passed in full
-    // We need to pass in the split data config, any of them, for the predict modules 
+    // We need to pass in the split data config, any of them, for the predict modules
     // This will be changed in the future
-    prediction_data = prediction_data.combine(TUNE_WF.out.data_config.first().map{meta,file -> file}) 
+    prediction_data = prediction_data.combine(TUNE_WF.out.data_config.first().map{meta,file -> file})
     EVALUATION_WF(
         TUNE_WF.out.best_model,
         prediction_data

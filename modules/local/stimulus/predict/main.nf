@@ -34,7 +34,7 @@ process STIMULUS_PREDICT {
     prefix = task.ext.prefix ?: meta.id
     """
     touch ${prefix}-pred.safetensors
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         stimulus: \$(stimulus -v | cut -d ' ' -f 3)

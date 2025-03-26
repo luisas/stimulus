@@ -7,7 +7,7 @@ process STIMULUS_COMPARE_TENSORS {
     tuple val(meta), path(tensors)
 
     output:
-    tuple val(meta), path("${prefix}.csv"), emit: csv
+    tuple val(meta), path("${prefix}_scores.csv"), emit: csv
     path "versions.yml"          , emit: versions
 
     script:
@@ -17,18 +17,19 @@ process STIMULUS_COMPARE_TENSORS {
     def values = meta.values().join(",")
     """
     stimulus compare-tensors \
-        -t ${tensors} \
-        ${args} >> scores.txt
+        ${tensors} \
+        -s scores.csv \
+        ${args}
 
-    # Extract first row of scores.txt
-    header_scores=\$(head -n 1 scores.txt)
+    # Extract first row of scores.csv
+    header_scores=\$(head -n 1 scores.csv)
 
     # Add metadata info to output file
-    echo "${header},\$header_scores" > "${prefix}.scores"
+    echo "${header},\$header_scores" > "${prefix}_scores.csv"
 
     # Add values
-    scores=\$(awk '{sub(/[[:space:]]+\$/, "")} 1' scores.txt | tr -s '[:blank:]' ',')
-    echo "${values},\$scores" >> "${prefix}.scores"
+    scores=\$(awk 'NR==2  {sub(/[[:space:]]+\$/, "")} NR==2' scores.csv | tr -s '[:blank:]' ',')
+    echo "${values},\$scores" >> "${prefix}_scores.csv"
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -40,7 +41,7 @@ process STIMULUS_COMPARE_TENSORS {
     prefix = task.ext.prefix ?: meta.id
     """
     touch ${prefix}.csv
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         stimulus: \$(stimulus -v | cut -d ' ' -f 3)
