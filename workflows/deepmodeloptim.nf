@@ -80,8 +80,9 @@ workflow DEEPMODELOPTIM {
     // ==============================================================================
     // split csv data file
     // ==============================================================================
+
     SPLIT_CSV_WF(
-        ch_data.collect(),
+        ch_data,
         ch_yaml_sub_config_split
     )
     ch_split_data = SPLIT_CSV_WF.out.split_data
@@ -89,6 +90,7 @@ workflow DEEPMODELOPTIM {
     // ==============================================================================
     // split meta yaml transform config file into individual yaml files
     // ==============================================================================
+
     SPLIT_DATA_CONFIG_TRANSFORM_WF( ch_yaml_sub_config_split )
     ch_yaml_sub_config = SPLIT_DATA_CONFIG_TRANSFORM_WF.out.sub_config
 
@@ -103,22 +105,32 @@ workflow DEEPMODELOPTIM {
     ch_transformed_data = TRANSFORM_CSV_WF.out.transformed_data
 
     // ==============================================================================
-    // Check model
+    // check model
     // ==============================================================================
 
+    // pre-step to check everything is fine
+    // to do so we only run the first element of the sorted channel, as we don't need
+    // to check on each transformed data
+    // we sort the channel so that we always get the same input, as the default order
+    // of the channel depends on which process finishes first (run in parallel)
+    ch_check_input_data = ch_transformed_data.toSortedList().flatten().buffer(size:2).first()
+    ch_check_input_config = ch_yaml_sub_config.toSortedList().flatten().buffer(size:2).first()
+
     CHECK_MODEL_WF (
-        ch_transformed_data.first(),
-        ch_yaml_sub_config.first(),
+        ch_check_input_data,
+        ch_check_input_config,
         ch_model,
         ch_model_config,
         ch_initial_weights
     )
 
     // ==============================================================================
-    // Tune model
+    // tune model
     // ==============================================================================
+
     // Create dependancy WF dependency to ensure TUNE_WF runs after CHECK_MODEL_WF finished
     ch_transformed_data = CHECK_MODEL_WF.out.concat(ch_transformed_data)
+        .filter{it}   // remove the empty element from the check model
 
     TUNE_WF(
         ch_transformed_data,
@@ -137,9 +149,9 @@ workflow DEEPMODELOPTIM {
     // Now the data config will not work if passed in full
     // We need to pass in the split data config, any of them, for the predict modules
     // This will be changed in the future
-    prediction_data = prediction_data.combine(TUNE_WF.out.data_config.first().map{meta,file -> file})
+    prediction_data = prediction_data.combine(TUNE_WF.out.data_config_tmp.first().map{meta,file -> file})
     EVALUATION_WF(
-        TUNE_WF.out.best_model,
+        TUNE_WF.out.model_tmp,
         prediction_data
     )
 
@@ -152,7 +164,6 @@ workflow DEEPMODELOPTIM {
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
-
 
     emit:
     versions = ch_versions  // channel: [ path(versions.yml) ]

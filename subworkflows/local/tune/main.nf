@@ -39,30 +39,46 @@ workflow TUNE_WF {
     ch_model_config = CUSTOM_MODIFY_MODEL_CONFIG.out.config
 
     ch_tune_input = ch_transformed_data
-        .join(ch_yaml_sub_config)
-        .combine(ch_model)
+        .map { meta, data ->
+            [[split_id: meta.split_id, transform_id: meta.transform_id], meta, data]
+        }
+        .combine(
+            ch_yaml_sub_config.map { meta, config ->
+                [[split_id: meta.split_id, transform_id: meta.transform_id], config]
+            }
+            ,by: 0
+        )
+        .combine(ch_model.map{it[1]})
         .combine(ch_model_config)
-        .combine(ch_initial_weights)
+        .combine(ch_initial_weights)    // when initial_weights is empty .map{it[1]} will return [], and not properly combined
         .combine(tune_replicates)
-        .multiMap { meta, data, data_config, meta_model, model, meta_model_config, model_config, meta_weights, initial_weights, n_replicate ->
-            data_and_config:
-                [meta+[replicate: n_replicate], data, data_config]
-            model_and_config:
-                [meta_model+[replicate: n_replicate]+meta_model_config, model, model_config, initial_weights]
+        .multiMap { key, meta, data, data_config, model, meta_model_config, model_config, meta_weights, initial_weights, n_replicate ->
+            def meta_new = meta + [replicate: n_replicate] + [n_trials: meta_model_config.n_trials]
+            data:
+                [meta_new, data, data_config]
+            model:
+                [meta_new, model, model_config, initial_weights]
         }
 
+    // run stimulus tune
     STIMULUS_TUNE(
-        ch_tune_input.data_and_config,
-        ch_tune_input.model_and_config
+        ch_tune_input.data,
+        ch_tune_input.model
     )
+
     ch_versions = ch_versions.mix(STIMULUS_TUNE.out.versions)
 
+    // parse output for evaluation block
+
     emit:
-    best_model = STIMULUS_TUNE.out.best_model
-    optimizer  = STIMULUS_TUNE.out.optimizer
-    data_config = STIMULUS_TUNE.out.data_config
-    tune_experiments = STIMULUS_TUNE.out.tune_experiments
+    best_model = STIMULUS_TUNE.out.model
+    optimizer = STIMULUS_TUNE.out.optimizer
+    tune_experiments = STIMULUS_TUNE.out.artifacts
+    journal = STIMULUS_TUNE.out.journal
     versions = ch_versions // channel: [ versions.yml ]
+    // these are temporaly needed for predict, it will be changed in the future!
+    model_tmp = STIMULUS_TUNE.out.model_tmp
+    data_config_tmp = STIMULUS_TUNE.out.data_config_tmp
 }
 
 /*

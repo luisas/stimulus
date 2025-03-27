@@ -160,6 +160,12 @@
                     "minimum": 0,
                     "help_text": "requesting the gpus for the tuning steps.",
                     "description": "set maximum GPU limit"
+                },
+                "container_dev": {
+                    "type": "string",
+                    "default": null,
+                    "help_text": "Container for development stage.",
+                    "description": "Container for development stage"
                 }
             }
         },
