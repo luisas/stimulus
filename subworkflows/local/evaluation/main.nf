@@ -76,7 +76,6 @@ workflow EVALUATION_WF {
     }
     .set { ch_cosine_summary }
     CONCAT_COSINE (ch_cosine_summary, "csv", "csv")
-    
 
     emit:
     versions = ch_versions // channel: [ versions.yml ]

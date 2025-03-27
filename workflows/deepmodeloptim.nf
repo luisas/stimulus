@@ -106,13 +106,13 @@ workflow DEEPMODELOPTIM {
     // Check model
     // ==============================================================================
 
-    // CHECK_MODEL_WF (
-    //     ch_transformed_data.first(),
-    //     ch_yaml_sub_config.first(),
-    //     ch_model,
-    //     ch_model_config,
-    //     ch_initial_weights
-    // )
+    CHECK_MODEL_WF (
+        ch_transformed_data.first(),
+        ch_yaml_sub_config.first(),
+        ch_model,
+        ch_model_config,
+        ch_initial_weights
+    )
 
     // ==============================================================================
     // Tune model
