@@ -49,11 +49,11 @@ workflow TUNE_WF {
             ,by: 0
         )
         .combine(ch_model.map{it[1]})
-        .combine(ch_model_config.map{it[1]})
+        .combine(ch_model_config)
         .combine(ch_initial_weights)    // when initial_weights is empty .map{it[1]} will return [], and not properly combined
         .combine(tune_replicates)
-        .multiMap { key, meta, data, data_config, model, model_config, meta_weights, initial_weights, n_replicate ->
-            def meta_new = meta + [replicate: n_replicate]
+        .multiMap { key, meta, data, data_config, model, meta_model_config, model_config, meta_weights, initial_weights, n_replicate ->
+            def meta_new = meta + [replicate: n_replicate] + [n_trials: meta_model_config.n_trials]
             data:
                 [meta_new, data, data_config]
             model:
