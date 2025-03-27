@@ -12,6 +12,10 @@ process STIMULUS_TUNE {
     tuple val(meta), path("${prefix}-best-optimizer.opt")             , emit: optimizer
     tuple val(meta), path("optuna_results/artifacts")                 , emit: artifacts
     tuple val(meta), path("optuna_results/optuna_journal_storage.log"), emit: journal
+    path "versions.yml"                                               , emit: versions
+    // now we need to output these in this format for the predict module - thiw will have to be changed!
+    tuple val(meta), path(model), path("best_config.json"), path("${prefix}-best-model.safetensors"), emit: model_tmp
+    tuple val(meta), path(data_sub_config)                                                          , emit: data_config_tmp
 
     script:
     prefix = task.ext.prefix ?: meta.id
@@ -38,6 +42,7 @@ process STIMULUS_TUNE {
     """
     touch ${prefix}-best-model.safetensors
     touch ${prefix}-best-optimizer.opt
+    touch best_config.json
     touch TuneModel_stub.txt
 
     cat <<-END_VERSIONS > versions.yml

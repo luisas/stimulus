@@ -15,6 +15,7 @@ include { SPLIT_DATA_CONFIG_TRANSFORM_WF      } from '../subworkflows/local/spli
 include { SPLIT_CSV_WF                        } from '../subworkflows/local/split_csv'
 include { TRANSFORM_CSV_WF                    } from '../subworkflows/local/transform_csv'
 include { TUNE_WF                             } from '../subworkflows/local/tune'
+include { EVALUATION_WF                       } from '../subworkflows/local/evaluation'
 
 //
 // MODULES: Consisting of nf-core/modules
@@ -37,6 +38,9 @@ workflow DEEPMODELOPTIM {
     ch_initial_weights
     ch_preprocessing_config
     ch_genome
+    tune_trials_range
+    tune_replicates
+    prediction_data
 
     main:
 
@@ -133,12 +137,24 @@ workflow DEEPMODELOPTIM {
         ch_yaml_sub_config,
         ch_model,
         ch_model_config,
-        ch_initial_weights
+        ch_initial_weights,
+        tune_trials_range,
+        tune_replicates
     )
 
     // ==============================================================================
-    // report
+    // Evaluation
     // ==============================================================================
+
+    // Now the data config will not work if passed in full
+    // We need to pass in the split data config, any of them, for the predict modules
+    // This will be changed in the future
+    prediction_data = prediction_data.combine(TUNE_WF.out.data_config_tmp.first().map{meta,file -> file})
+    EVALUATION_WF(
+        TUNE_WF.out.model_tmp,
+        prediction_data
+    )
+
 
     // Software versions collation remains as comments
     softwareVersionsToYAML(ch_versions)

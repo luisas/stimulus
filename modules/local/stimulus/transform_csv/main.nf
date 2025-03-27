@@ -12,6 +12,7 @@ process STIMULUS_TRANSFORM_CSV {
 
     output:
     tuple val(meta), path("${prefix}.csv"), emit: transformed_data
+    path "versions.yml"          , emit: versions
 
     script:
     prefix = task.ext.prefix ?: "${meta.id}-${meta2.id}-trans"

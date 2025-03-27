@@ -20,6 +20,8 @@ workflow SPLIT_CSV_WF {
 
     main:
 
+    ch_versions = Channel.empty()
+
     // ==============================================================================
     // Split csv data using stimulus
     // ==============================================================================
@@ -41,9 +43,11 @@ workflow SPLIT_CSV_WF {
         ch_input.config
     )
     ch_split_data = STIMULUS_SPLIT_DATA.out.csv_with_split
+    ch_versions = ch_versions.mix(STIMULUS_SPLIT_DATA.out.versions)
 
     emit:
     split_data = ch_split_data
+    versions = ch_versions // channel: [ versions.yml ]
 }
 
 
