@@ -19,6 +19,10 @@ workflow TRANSFORM_CSV_WF {
     ch_config_transform
 
     main:
+
+    ch_versions = Channel.empty()
+
+
     // TODO add strategy for handling the launch of stimulus noiser as well as NF-core and other modules
     // TODO if the option is parellalization (for the above) then add csv column splitting  noising  merging
 
